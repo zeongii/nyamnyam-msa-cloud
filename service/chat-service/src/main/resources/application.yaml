@@ -1,6 +1,6 @@
 spring:
   application:
-    name: restaurant-service
+    name: chat-service
   profiles:
     active: local
   config:

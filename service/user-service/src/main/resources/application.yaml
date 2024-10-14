@@ -1,35 +1,7 @@
 spring:
-  main:
-    allow-bean-definition-overriding: true  # Bean 정의 오버라이딩 허용
-    web-application-type: reactive
-  data:
-    mongodb:
-      uri: mongodb://root:1234@211.188.50.33:27017/test  # MongoDB 연결 URI
-      auto-index-creation: true  # 자동 인덱스 생성
-  jackson:
-    date-format: yyyy-MM-dd'T'HH:mm:ss'Z'  # 날짜 포맷
-    time-zone: UTC  # 시간대 설정
-  webflux:
-    base-path: /api  # API의 기본 경로 (선택 사항, 필요 시 설정)
-
   application:
     name: user-service
   profiles:
     active: local
   config:
     import: optional:configserver:http://localhost:8888
-
-naver:
-  storage:
-    accessKey: ncp_iam_BPASKR4hDZEqhZxoJTU0  # Naver Cloud Storage 접근 키
-    secretKey: ncp_iam_BPKSKRW7EiCKxGGi0L9AODsJCwtJ8wcZ9a  # Naver Cloud Storage 비밀 키
-    bucket: nyamnyam  # Naver Cloud Storage 버킷 이름
-    upload:
-      path: uploads/chats  # 업로드 경로
-
-jwt:
-  secret:
-    key: ${JWT_SECRET_KEY}  # 여기 비밀키를 설정하세요.
-  validity:
-    in:
-      milliseconds: 3600000  # 유효성 기간을 설정하세요 (1시간).
