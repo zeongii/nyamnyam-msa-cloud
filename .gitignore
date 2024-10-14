@@ -40,4 +40,4 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/static/chromedriver-win64/
-*/.yml
+*.yml
