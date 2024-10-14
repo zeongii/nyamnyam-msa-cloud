@@ -1,0 +1,10 @@
+rootProject.name = 'nyamnyam'
+include 'server:config-server'
+include 'server:eureka-server'
+include 'server:gateway-server'
+include 'service:admin-service'
+include 'service:chat-service'
+include 'service:post-service'
+include 'service:restaurant-service'
+include 'service:user-service'
+

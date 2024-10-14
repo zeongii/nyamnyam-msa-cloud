@@ -1,0 +1,72 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  config:
+    activate:
+      on-profile: default
+
+  application:
+    name: api
+
+  main:
+    allow-bean-definition-overriding: true
+    web-application-type: reactive
+
+
+  cloud:
+    gateway:
+
+      routes:
+        - id: admin-service
+          uri: lb://admin-service
+          predicates:
+            - Path=/admin-service/login
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+        - id: chat-service
+          uri: lb://chat-service
+          predicates:
+            - Path=/chat-service/chats
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/chat-service/(?<segment>.*), /$\{segment}
+        - id: post-service
+          uri: lb://post-service/actuator/**
+          predicates:
+            - Path=/post-service/posts
+            - Method=GET, POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/post-service/(?<segment>.*), /$\{segment}
+        - id: restaurant-service
+          uri: lb://restaurant-service
+          predicates:
+            - Path=/restaurant-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/restaurant-service/(?<segment>.*), /$\{segment}
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+
+jwt:
+  secret: sdkjkd1223232323klkl
