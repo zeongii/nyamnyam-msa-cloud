@@ -1,6 +1,6 @@
 spring:
   application:
-    name: post-service
+    name: restaurant-service
   datasource:
     url: jdbc:mysql://223.130.131.65:3306/nyamnyamdb
     username: root
