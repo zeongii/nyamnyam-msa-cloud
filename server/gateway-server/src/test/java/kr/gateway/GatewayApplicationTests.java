@@ -1,10 +1,10 @@
-package kr.gatewayserver;
+package kr.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GatewayServerApplicationTests {
+class GatewayApplicationTests {
 
     @Test
     void contextLoads() {

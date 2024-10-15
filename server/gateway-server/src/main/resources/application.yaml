@@ -1,6 +1,0 @@
-application:
-  name: gateway-server
-profiles:
-  active: local
-config:
-  import: optional:configserver:http://localhost:8888
