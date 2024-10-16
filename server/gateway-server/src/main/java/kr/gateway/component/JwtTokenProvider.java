@@ -1,8 +1,10 @@
-package kr.gateway.util;
+package kr.gateway.component;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -10,36 +12,40 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@Getter
 @Component
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private long validityInMilliseconds;
+    @Value("${jwt.expired.access}")
+    private long accessTokenExpired;
 
-    public Mono<String> createToken(String userId) {
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + validityInMilliseconds);
+    @Value("${jwt.expired.refresh}")
+    private long refreshTokenExpired;
 
-        // 비밀 키를 Key 객체로 변환
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        Key key = Keys.hmacShaKeyFor(keyBytes);
+    public Mono<String> generateToken(UserDetails userDetails, boolean isRefresh) {
+         Date now = new Date();
+         Date expiration = new Date(now.getTime() + accessTokenExpired);
 
-        String token = Jwts.builder()
-                .setSubject(userId)
-                .setIssuedAt(now)
-                .setExpiration(expiration)
-                .signWith(key) // 변경된 부분
-                .compact();
+         // 비밀 키를 Key 객체로 변환
+         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+         Key key = Keys.hmacShaKeyFor(keyBytes);
+
+         String token = Jwts.builder()
+                 .setSubject(userDetails.getUsername())
+                 .setIssuedAt(now)
+                 .setExpiration(expiration)
+                 .signWith(key) // 변경된 부분
+                 .compact();
 
         return Mono.just(token);
     }
 
     public Mono<String> createOAuthToken(String username, String objectId) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + validityInMilliseconds);
+        Date expiration = new Date(now.getTime() + accessTokenExpired);
 
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         Key key = Keys.hmacShaKeyFor(keyBytes);
@@ -57,10 +63,10 @@ public class JwtTokenProvider {
 
     public Mono<Boolean> validateToken(String token) {
         try {
-            Jwts.parserBuilder() // parserBuilder 사용
-                    .setSigningKey(secret) // 비밀 키 설정
+            Jwts.parser() // parserBuilder 사용
+                    .verifyWith(secret) // 비밀 키 설정
                     .build() // JwtParser 생성
-                    .parseClaimsJws(token); // 토큰 파싱
+                    .parseSignedClaims(token); // 토큰 파싱
             return Mono.just(true);
         } catch (ExpiredJwtException e) {
             // 만료된 토큰 처리

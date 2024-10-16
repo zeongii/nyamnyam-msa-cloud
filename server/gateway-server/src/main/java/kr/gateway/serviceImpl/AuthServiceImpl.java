@@ -1,9 +1,9 @@
 package kr.gateway.serviceImpl;
 
+import kr.gateway.component.JwtTokenProvider;
 import kr.gateway.document.LoginRequest;
 import kr.gateway.document.OAuth2Request;
 import kr.gateway.service.AuthService;
-import kr.gateway.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Mono<String> login(LoginRequest request) {
         return Mono.just(request.getUsername())
-                .flatMap(username -> jwtTokenProvider.createToken(username));
+                .flatMap(username -> jwtTokenProvider.generateToken(username));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 4. JWT 생성 시 예외 처리
-        return jwtTokenProvider.createToken(provider)
+        return jwtTokenProvider.generateToken(provider)
                 .doOnSuccess(token -> System.out.println("JWT 생성 성공: " + token))
                 .doOnError(e -> System.out.println("JWT 생성 실패: " + e.getMessage()));
     }
