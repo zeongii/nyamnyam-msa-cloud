@@ -1,8 +1,7 @@
 package kr.gateway.config;
 
-
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
@@ -11,9 +10,8 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 public class WebFluxConfig implements WebFluxConfigurer {
 
     @Override
-    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-        configurer.defaultCodecs().enableLoggingRequestDetails(true);
-    }
+    public void addFormatters(FormatterRegistry registry) {
 
+    }
 
 }

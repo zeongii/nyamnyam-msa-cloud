@@ -13,26 +13,31 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 @Log4j2
-@Component
 @RequiredArgsConstructor
+@Component
 public class CustomServerAuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication authentication) {
-        log.info("WebFilterExchange 정보 : " + exchange);
-        log.info("Authentication 정보 : " + authentication);
-        log.info("Authorities 정보 : " + authentication.getAuthorities());
-        log.info("Credentials 정보 : " + authentication.getPrincipal());
+        String requestPath = exchange.getExchange().getRequest().getPath().toString();
+        log.info("WebFilterExchange 정보 :" + exchange);
+        log.info("Authentication 정보:" + authentication);
+        log.info("Authorities 정보:" + authentication.getAuthorities());
+        log.info("Credentials 정보:" + authentication.getCredentials());
 
-        if (requestPath.startsWith("/auth/login", "/auth/oauth2")) {
+        if (requestPath.startsWith("/auth/login")) {
+
+            exchange.getExchange().getResponse().setStatusCode(HttpStatus.FOUND);
             exchange.getExchange().getResponse().getHeaders().setLocation(URI.create("http://localhost:3000"));
             exchange.getExchange().getResponse().getHeaders().add("Content-Type", "application/json");
+
+            // 토큰 생성 부분 주석 처리
+            /*
             exchange.getExchange().getResponse()
                     .writeWith(
-                            jwtTokenProvider.generateToken(null, false) // 토큰 발급
+                            jwtTokenProvider.generateToken(null, false)
                                     .doOnNext(accessToken ->
                                             exchange
                                                     .getExchange()
@@ -41,21 +46,25 @@ public class CustomServerAuthenticationSuccessHandler implements ServerAuthentic
                                                     .add("accessToken",
                                                             ResponseCookie.from("accessToken")
                                                                     .path("/")
-                                                                    .maxAge(jwtTokenProvider.getAccessTokenExpired())
-                                                                    .build())
-                                    )
-                    ) // 쿠키 생성 및 설정
-                    .flatMap(i -> jwtTokenProvider.generateToken(null, true)) // 리프레시 토큰 발급
-                    .doOnNext(signalType -> log.info("OAuth2 Login Success"))   // 로그 출력
-                    .flatMap(signalType -> exchange.getExchange().getResponse().setComplete())
-                    .flatMap(signalType -> Mono.empty())
-            );
-        }else{
+                                                                    .maxAge(jwtTokenProvider.accessTokenExpiration())
+                                                                    .build()
+                                                    )
+                                    )//쿠키 생성 및 설정
+                                    .flatMap(i -> jwtTokenProvider.generateToken(null, true))
+                                    .doOnNext(signalType -> log.info("Oauth2 Login Success"))
+                                    .flatMap(signalType -> exchange.getExchange().getResponse().setComplete())
+                                    .flatMap(signalType -> Mono.empty())
+                    );
+            */
+
+            // 테스트용 단순 응답 반환
+            return exchange.getExchange().getResponse().setComplete();
+
+        } else {
             // 지정된 url 이 아닌 경우
-            return  Mono.empty();  // 필터 체인 종료
+            return Mono.empty();  // 필터 체인 종료
         }
-
-
     }
-
 }
+
+
