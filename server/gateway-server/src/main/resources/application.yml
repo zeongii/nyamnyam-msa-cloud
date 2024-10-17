@@ -9,4 +9,6 @@ spring:
 
 jwt:
   secret: "bywm4zC5-vR36j_mZPsd4jmNFUuny0XuYoln59AStsI="
-  expiration: 3600000  # 1시간 (초단위)
+  expired:
+    access: 3600000  # 액세스 토큰 만료 시간 (예: 1시간)
+    refresh: 7200000 # 리프레시 토큰 만료 시간 (예: 2시간)
