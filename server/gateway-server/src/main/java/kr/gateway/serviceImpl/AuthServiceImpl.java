@@ -17,7 +17,7 @@
 //
 //@Service
 //@RequiredArgsConstructor
-//public class AuthService {
+//public class AuthServiceImpl implements AuthService {
 //
 //    private final WebClient webClient = WebClient.create();
 //    private final JwtTokenProvider jwtTokenProvider;
