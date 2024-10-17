@@ -39,6 +39,9 @@ dependencies {
     // Spring Boot 스타터
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     // QueryDSL 의존성
     implementation group: 'com.querydsl', name: 'querydsl-codegen', version: '5.1.0'
