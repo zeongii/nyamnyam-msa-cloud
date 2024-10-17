@@ -1,76 +1,107 @@
-//package kr.gateway.serviceImpl;
-//
-//import kr.gateway.component.JwtTokenProvider;
-//import kr.gateway.document.LoginRequest;
-//
-//import kr.gateway.service.AuthService;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Service;
-//import org.springframework.web.reactive.function.client.WebClient;
-//import org.springframework.web.server.ServerWebExchange;
-//import org.springframework.web.util.UriComponentsBuilder;
-//import reactor.core.publisher.Mono;
-//
-//import java.util.UUID;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class AuthService {
-//
-//    private final WebClient webClient = WebClient.create();
-//    private final JwtTokenProvider jwtTokenProvider;
-//
+package kr.gateway.service;
+
+import kr.gateway.document.User;
+import kr.gateway.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@RequiredArgsConstructor
+@Service
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final TokenService tokenService;
+
+    public Mono<Boolean> existsById(String id) {
+        return userRepository.existsById(id);
+    }
+
+    public Mono<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public Mono<User> findById(String id) {
+        return userRepository.findById(id);
+    }
+
+    public Flux<User> findAll() {
+        return userRepository.findAll();
+    }
+
 //    @Override
-//    public Mono<String> login(LoginRequest request) {
-//        return Mono.just(request.getUsername())
-//                .flatMap(username -> jwtTokenProvider.createToken(username));
-//    }
-//
-//    @Override
-//    public Mono<Boolean> validateToken(String token) {
-//        return jwtTokenProvider.validateToken(token);
-//    }
-//
-//    @Override
-//    public String getUserIdFromToken(String token) {
-//        return jwtTokenProvider.getUserIdFromToken(token);
+//    public Mono<Long> count() {
+//        return userRepository.count();
 //    }
 //
 //    @Override
-//    public Mono<String> refreshToken(String oldToken) {
-//        return jwtTokenProvider.refreshToken(oldToken);
+//    public Mono<Void> deleteById(String id) {
+//        return userRepository.deleteById(id);
 //    }
 //
 //    @Override
-//    public Mono<Void> logout(String token) {
-//        return jwtTokenProvider.invalidateToken(token);
+//    public Mono<User> update(User user, List<MultipartFile> thumbnails) {
+//        return userRepository.findById(user.getId())
+//                .flatMap(existingUser -> {
+//                    existingUser.setUsername(user.getUsername() != null ? user.getUsername() : existingUser.getUsername());
+//                    existingUser.setPassword(user.getPassword() != null ? user.getPassword() : existingUser.getPassword());
+//                    existingUser.setNickname(user.getNickname() != null ? user.getNickname() : existingUser.getNickname());
+//                    existingUser.setName(user.getName() != null ? user.getName() : existingUser.getName());
+//                    existingUser.setAge(user.getAge() != null ? user.getAge() : existingUser.getAge());
+//                    existingUser.setRole(user.getRole() != null ? user.getRole() : existingUser.getRole());
+//                    existingUser.setTel(user.getTel() != null ? user.getTel() : existingUser.getTel());
+//                    existingUser.setGender(user.getGender() != null ? user.getGender() : existingUser.getGender());
+//                    existingUser.setEnabled(user.getEnabled() != null ? user.getEnabled() : existingUser.getEnabled());
+//
+//                    // 썸네일 업데이트 처리
+//                    return userThumbnailService.uploadThumbnail(existingUser, thumbnails)
+//                            .then(userRepository.save(existingUser));
+//                })
+//                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
 //    }
 //
-//    public Mono<ResponseEntity<Void>> redirectToNaverLogin(ServerWebExchange exchange) {
-//        String state = UUID.randomUUID().toString();
+//    @Override
+//    public Mono<User> save(User user, List<MultipartFile> thumbnails) {
+//        return userRepository.findByUsername(user.getUsername())
+//                .flatMap(existingUser -> Mono.<User>error(new RuntimeException("Username is already taken.")))
+//                .switchIfEmpty(
+//                        Mono.defer(() -> {
+//                            String encodedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+//                            User newUser = User.builder()
+//                                    .username(user.getUsername())
+//                                    .password(encodedPassword)
+//                                    .nickname(user.getNickname())
+//                                    .name(user.getName())
+//                                    .age(user.getAge())
+//                                    .role("USER")
+//                                    .tel(user.getTel())
+//                                    .gender(user.getGender())
+//                                    .enabled(true)
+//                                    .score(36.5)
+//                                    .build();
 //
-//        saveStateInSession(exchange, state);
+//                            return userRepository.save(newUser)
+//                                    .flatMap(savedUser ->
+//                                            userThumbnailService.uploadThumbnail(savedUser, thumbnails)
+//                                                    .flatMap(thumbnailIds -> {
+//                                                        String imgId = thumbnailIds.isEmpty() ? null : thumbnailIds.get(0);
+//                                                        savedUser.setImgId(imgId);
 //
-//        String authorizationUri = UriComponentsBuilder.fromUriString("https://nid.naver.com/oauth2.0/authorize")
-//                .queryParam("response_type", "code")
-//                .queryParam("client_id", "e2iaB9q3A_kk1k7hX6Qi")
-//                .queryParam("redirect_uri", "http://localhost:8000/auth/oauth2/code/naver")
-//                .queryParam("state", state)
-//                .queryParam("scope", "email profile")
-//                .build()
-//                .toUriString();
-//
-//        return Mono.just(ResponseEntity.status(HttpStatus.FOUND)
-//                .header("Location", authorizationUri)
-//                .build());
+//                                                        return userRepository.save(savedUser);
+//                                                    })
+//                                    );
+//                        })
+//                );
 //    }
-//
-//    private void saveStateInSession(ServerWebExchange exchange, String state) {
-//        exchange.getSession().doOnNext(session -> {
-//            session.getAttributes().put("oauth_state", state);
-//            System.out.println("Saved state in session: " + state);
-//        }).subscribe();
-//    }
-//}
+
+
+
+    public Mono<String> authenticate(String username, String password) {
+        return userRepository.findByUsername(username)
+                .filter(user -> new BCryptPasswordEncoder().matches(password, user.getPassword()))
+                .flatMap(user -> tokenService.createAndSaveToken(user.getId()));
+    }
+}
+
