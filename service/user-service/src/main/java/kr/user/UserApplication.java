@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @EnableReactiveMongoRepositories
 @SpringBootApplication
 @EnableDiscoveryClient
-public class UserApplication {
+public class  UserApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);
