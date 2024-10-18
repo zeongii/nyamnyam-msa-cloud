@@ -1,14 +1,7 @@
-spring:
-  application:
-    name: gateway-server
-  profiles:
-    active: local
-  config:
-    import: optional:configserver:http://localhost:8888
-
-
-jwt:
-  secret: "bywm4zC5-vR36j_mZPsd4jmNFUuny0XuYoln59AStsI="
-  expired:
-    access: 3600000  # 액세스 토큰 만료 시간 (예: 1시간)
-    refresh: 7200000 # 리프레시 토큰 만료 시간 (예: 2시간)
+  spring:
+    application:
+      name: gateway-server
+    profiles:
+      active: local
+    config:
+      import: optional:configserver:http://localhost:8888

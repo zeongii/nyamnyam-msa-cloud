@@ -3,6 +3,7 @@ package kr.gateway.component;
 import kr.gateway.component.JwtTokenProvider;
 import kr.gateway.config.UserDetailsImpl;
 import kr.gateway.document.LoginRequest;
+import kr.gateway.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -31,31 +34,32 @@ public class AuthHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final WebClient webClient = WebClient.create();
+    private final UserRepository userRepository;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public Mono<ServerResponse> login(ServerRequest request) {
+        System.out.println("Login request received");
         return request.bodyToMono(LoginRequest.class)
-                .flatMap(req -> {
-                    // 대부분은 'USER' 역할로 설정하고, 특정 사용자에 대해 다른 역할을 부여
-                    String role;
-                    if ("adminUser".equals(req.getUsername())) {  // 'adminUser'를 관리자 계정으로 설정
-                        role = "ADMIN";  // 특정 유저는 ADMIN 역할
-                    } else {
-                        role = "USER";  // 그 외의 유저는 USER 역할
-                    }
+                .flatMap(req -> userRepository.findByUsername(req.getUsername())
+                        .flatMap(user -> {
+                            if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+                                return Mono.error(new RuntimeException("Invalid password"));
+                            }
 
-                    // UserDetails에 역할 설정
-                    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
-                    UserDetails userDetails = new UserDetailsImpl(req.getUsername(), req.getPassword(), authorities);
+                            String role = user.getRole() != null ? user.getRole() : "USER";
 
-                    // JWT 생성
-                    return jwtTokenProvider.generateToken(userDetails, false)
-                            .flatMap(jwt -> ServerResponse.ok().bodyValue("Login successful. JWT: " + jwt));
-                })
+                            UserDetails userDetails = new UserDetailsImpl(
+                                    user.getUsername(),
+                                    user.getPassword(),
+                                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                            );
+
+                            return jwtTokenProvider.generateToken(userDetails, false)
+                                    .flatMap(jwt -> ServerResponse.ok().bodyValue("Login successful. JWT: " + jwt));
+                        })
+                        .switchIfEmpty(Mono.error(new RuntimeException("User not found"))))
                 .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("Error: " + e.getMessage()));
     }
-
-
-
 
 
 //
