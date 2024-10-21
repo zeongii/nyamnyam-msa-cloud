@@ -1,46 +1,52 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER = 'sudo docker'
+        repository = "zeongiii/nyamnyam-config-server"
+        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
+        dockerImage = ''
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('git scm update') {
             steps {
-                checkout scm
-                echo 'Checkout Scm'
+                git url: 'https://github.com/zeongii/nyamnyam-msa-cloud.git', branch: 'main'
             }
         }
 
-        stage('Build image') {
+        stage('Grant execute permissions') {
             steps {
-                sh 'ls -al'
-                dir('docker') {
-                    sh 'ls -al'
-                    sh 'chmod +x ./gradlew'
-                    sh './gradlew build'
-                    sh 'docker build -t zeongiii/nyamnyam-config-server .'
+                sh 'chmod +x gradlew'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir("./") {
+                    sh "./gradlew clean build --stacktrace"
                 }
-                echo 'Build image...'
             }
         }
 
-        stage('Remove Previous image') {
+        stage('Build-image') {
             steps {
                 script {
-                    try {
-                        h 'docker stop nyamnyam-config-server'
-                        sh 'docker rm nyamnyam-config-server'
-                    } catch (e) {
-                        echo 'fail to stop and remove container'
-                    }
+                    sh "docker build -t whdcks420/lunch:3.0 ."
                 }
             }
         }
-        stage('Run New image') {
+
+        stage('Docker Push') {
             steps {
-                sh 'docker run --name zeongiii/nyamnyam-config-server -d -p 8080:8080 zeongiii/nyamnyam-config-server'
-                echo 'Run New member image'
+                script {
+                    sh 'docker push whdcks420/lunch:3.0'
+                }
+            }
+        }
+
+        stage('Cleaning up') {
+            steps {
+                sh "docker rmi whdcks420/lunch:3.0"
             }
         }
     }
