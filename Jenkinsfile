@@ -2,52 +2,73 @@ pipeline {
     agent any
 
     environment {
-        repository = "zeongiii/nyamnyam-config-server"
-        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
-        dockerImage = ''
+        DOCKER_CREDENTIALS_ID = 'zeongiii'
+        DOCKER_IMAGE_PREFIX = 'zeongiii/nyamnyam'
+        SERVICES = [
+            'server-config-server',
+            'server-gateway-server',
+            'service-admin-service',
+            'service-chat-service',
+            'service-post-service',
+            'service-restaurant-service',
+            'service-user-service'
+        ]
     }
 
     stages {
-        stage('git scm update') {
-            steps {
-                git url: 'https://github.com/zeongii/nyamnyam-msa-cloud.git', branch: 'main'
-            }
-        }
-
-        stage('Grant execute permissions') {
-            steps {
-                sh 'chmod +x gradlew'
-            }
-        }
-
         stage('Build') {
             steps {
-                dir("./") {
-                    sh "./gradlew clean build --stacktrace"
+                script {
+                    for (service in SERVICES) {
+                        sh "cd ${service} && ./gradlew build"
+                    }
                 }
             }
         }
 
-        stage('Build-image') {
+        stage('Test') {
             steps {
                 script {
-                    sh "docker build -t whdcks420/lunch:3.0 ."
+                    for (service in SERVICES) {
+                        sh "cd ${service} && ./gradlew test"
+                    }
                 }
             }
         }
 
-        stage('Docker Push') {
+        stage('Docker Build & Push') {
             steps {
                 script {
-                    sh 'docker push whdcks420/lunch:3.0'
+                    for (service in SERVICES) {
+                        // Docker 이미지 빌드 및 푸시
+                        sh "cd ${service} && docker build -t ${DOCKER_IMAGE_PREFIX}-${service}:latest ."
+                        sh "cd ${service} && docker push ${DOCKER_IMAGE_PREFIX}-${service}:latest"
+                    }
                 }
             }
         }
 
-        stage('Cleaning up') {
+        stage('Deploy') {
             steps {
-                sh "docker rmi whdcks420/lunch:3.0"
+                script {
+                    // 각 서비스에 대한 배포 작업 정의
+                    for (service in SERVICES) {
+                        sh "kubectl apply -f k8s/${service}/deployment.yaml"
+                    }
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
