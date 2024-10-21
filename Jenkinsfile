@@ -16,6 +16,27 @@ pipeline {
                 }
             }
         }
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    def SERVICES = [
+                        'server-config-server',
+                        'server-gateway-server',
+                        'service-admin-service',
+                        'service-chat-service',
+                        'service-post-service',
+                        'service-restaurant-service',
+                        'service-user-service'
+                    ]
+
+                    for (service in SERVICES) {
+                        // Docker 이미지 빌드 및 푸시
+                        sh "cd ${service} && docker build -t ${DOCKER_IMAGE_PREFIX}-${service}:latest ."
+                        sh "cd ${service} && docker push ${DOCKER_IMAGE_PREFIX}-${service}:latest"
+                    }
+                }
+            }
+        }
 
         stage('Build') {
             steps {
@@ -57,27 +78,7 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Push') {
-            steps {
-                script {
-                    def SERVICES = [
-                        'server-config-server',
-                        'server-gateway-server',
-                        'service-admin-service',
-                        'service-chat-service',
-                        'service-post-service',
-                        'service-restaurant-service',
-                        'service-user-service'
-                    ]
 
-                    for (service in SERVICES) {
-                        // Docker 이미지 빌드 및 푸시
-                        sh "cd ${service} && docker build -t ${DOCKER_IMAGE_PREFIX}-${service}:latest ."
-                        sh "cd ${service} && docker push ${DOCKER_IMAGE_PREFIX}-${service}:latest"
-                    }
-                }
-            }
-        }
 
         stage('Deploy') {
             steps {
