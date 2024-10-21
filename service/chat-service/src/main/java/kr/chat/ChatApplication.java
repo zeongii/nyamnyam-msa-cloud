@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 @SpringBootApplication
 @EnableDiscoveryClient
 public class ChatApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(ChatApplication.class, args);
     }

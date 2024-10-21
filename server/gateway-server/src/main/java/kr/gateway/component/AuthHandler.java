@@ -1,16 +1,11 @@
 package kr.gateway.component;
 
-import kr.gateway.component.JwtTokenProvider;
-import kr.gateway.config.UserDetailsImpl;
 import kr.gateway.document.LoginRequest;
 import kr.gateway.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -20,11 +15,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,36 +41,44 @@ public class AuthHandler {
 
                             String role = user.getRole() != null ? user.getRole() : "USER";
 
-                            UserDetails userDetails = new UserDetailsImpl(
-                                    user.getUsername(),
-                                    user.getPassword(),
-                                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                            );
-
-                            return jwtTokenProvider.generateToken(userDetails, false)
+                            return jwtTokenProvider.generateToken(user.getId(), false)
                                     .flatMap(jwt -> ServerResponse.ok().bodyValue("Login successful. JWT: " + jwt));
                         })
                         .switchIfEmpty(Mono.error(new RuntimeException("User not found"))))
                 .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("Error: " + e.getMessage()));
     }
 
+    public Mono<ServerResponse> refreshToken(ServerRequest request) {
+        String authHeader = request.headers().firstHeader("Authorization");
 
-//
-//    // 2. 토큰 갱신 처리
-//    public Mono<ServerResponse> refreshToken(ServerRequest request) {
-//        return request.bodyToMono(String.class)
-//                .flatMap(jwtTokenProvider::refreshToken)
-//                .flatMap(newToken -> ServerResponse.ok().bodyValue("New Token: " + newToken))
-//                .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue(e.getMessage()));
-//    }
-//
-//    // 3. 로그아웃 처리
-//    public Mono<ServerResponse> logout(ServerRequest request) {
-//        return request.bodyToMono(String.class)
-//                .flatMap(jwtTokenProvider::invalidateToken)
-//                .then(ServerResponse.noContent().build())
-//                .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).build());
-//    }
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Mono.error(new RuntimeException("Invalid token"));
+        }
+
+        String refreshToken = authHeader.substring(7);
+        return jwtTokenProvider.refreshToken(refreshToken)
+                .flatMap(newToken -> {
+                    System.out.println("New Access Token generated: " + newToken);
+                    return ServerResponse.ok().bodyValue(Collections.singletonMap("newAccessToken", newToken));
+                })
+                .onErrorResume(e -> {
+                    System.out.println("Error occurred: " + e.getMessage());
+                    return ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue(e.getMessage());
+                });
+    }
+
+    public Mono<ServerResponse> logout(ServerRequest request) {
+        String authHeader = request.headers().firstHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Mono.error(new RuntimeException("Invalid token"));
+        }
+
+        String token = authHeader.substring(7);
+        return jwtTokenProvider.invalidateToken(token)
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).build());
+    }
 
     // 4. 네이버 로그인 리디렉션 처리
     public Mono<ServerResponse> redirectToNaverLogin(ServerRequest request) {
@@ -87,7 +88,7 @@ public class AuthHandler {
         String authorizationUri = UriComponentsBuilder.fromUriString("https://nid.naver.com/oauth2.0/authorize")
                 .queryParam("response_type", "code")
                 .queryParam("client_id", "e2iaB9q3A_kk1k7hX6Qi")
-                .queryParam("redirect_uri", "http://localhost:8000/auth/oauth2/code/naver")
+                .queryParam("redirect_uri", "http://localhost:8000/api/auth/oauth2/code/naver")
                 .queryParam("state", state)
                 .queryParam("scope", "profile")
                 .build()
@@ -114,54 +115,70 @@ public class AuthHandler {
                     String naverUserId = (String) naverUserInfo.get("id");
 
                     // user-service로 네이버 사용자 ID로 회원 조회 요청
-                    Mono<Void> registerUser = registerUserInUserServiceAsync(naverUserInfo); // 비동기 회원가입 처리
-
-                    // JWT 발급과 동시에 회원가입 비동기로 진행
-                    return issueJwtToken(naverUserInfo)
+                    return registerUserInUserServiceAsync(naverUserInfo)  // 회원가입을 성공적으로 처리한 후
+                            .then(issueJwtToken(naverUserInfo))               // 회원가입 성공 시 JWT 발급
                             .flatMap(jwt -> ServerResponse.ok().bodyValue("Login successful. JWT: " + jwt))
-                            .doOnSuccess(res -> registerUser.subscribe()); // 비동기 회원가입 처리 실행
+                            .onErrorResume(e -> {
+                                System.out.println("Error during registration: " + e.getMessage());
+                                return ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("Registration failed.");
+                            });
                 })
                 .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("Error: " + e.getMessage()));
     }
 
-    // user-service로 네이버 사용자 조회
+
     private Mono<User> checkUserInUserService(String naverUserId) {
         return webClient.get()
                 .uri("http://user/api/users/naver/{naverUserId}", naverUserId)
                 .retrieve()
                 .bodyToMono(User.class)
-                .onErrorResume(e -> Mono.empty());  // 오류 처리: 유저가 없으면 빈 값 반환
+                .onErrorResume(e -> Mono.empty());
     }
 
-    // user-service로 네이버 사용자 자동 회원가입 요청을 비동기로 처리
     private Mono<Void> registerUserInUserServiceAsync(Map<String, Object> naverUserInfo) {
-        return webClient.post()
-                .uri("http://user/api/users")
-                .bodyValue(naverUserInfo)
-                .retrieve()
-                .bodyToMono(Void.class) // 비동기 처리이므로 반환값 없음
-                .onErrorResume(e -> {
-                    // 실패 시 로깅 가능
-                    System.err.println("Failed to register user: " + e.getMessage());
-                    return Mono.empty();  // 오류 발생 시 빈 값 반환
-                });
+        System.out.println("회원 가입 요청 도달: " + naverUserInfo);
+
+        return Mono.empty();  // 요청을 처리하지 않고 빈 응답 반환
     }
 
+//    private Mono<Void> registerUserInUserServiceAsync(Map<String, Object> naverUserInfo) {
+//        return webClient.post()
+//                .uri("http://user-service/api/oauth/naver/signup")
+//                .bodyValue(naverUserInfo)
+//                .retrieve()
+//                .bodyToMono(Void.class)
+//                .onErrorResume(e -> {
+//                    System.err.println("Failed to register user: " + e.getMessage());
+//                    return Mono.empty();
+//                });
+//    }
 
     private Mono<String> issueJwtToken(Map<String, Object> naverUserInfo) {
-        String username = (String) naverUserInfo.get("nickname");
-        String password = "NaverOAuthPassword";  // OAuth 비밀번호는 더미 값 사용
+        String userId = (String) naverUserInfo.get("id");
 
-        // 기본적으로 USER 역할 부여
-        UserDetails userDetails = new UserDetailsImpl(
-                username,
-                password,
-                Collections.singletonList(new SimpleGrantedAuthority("USER"))
-        );
+        // 여기에 로그 메시지만 출력하고 JWT 발급 부분은 주석 처리
+        System.out.println("JWT 발급 예정: " + userId);
 
-        // JWT 생성
-        return jwtTokenProvider.generateToken(userDetails, false);
+        // 실제 JWT 발급을 막고 '발급 예정'이라는 가짜 응답만 반환
+        return Mono.just("JWT 발급 예정: " + userId);
     }
+
+
+//    private Mono<String> issueJwtToken(Map<String, Object> naverUserInfo) {
+//        String userId = (String) naverUserInfo.get("id");
+//
+//        String password = "NaverOAuthPassword";
+//
+//
+//        UserDetails userDetails = new UserDetailsImpl(
+//                userId,
+//                password,
+//                Collections.singletonList(new SimpleGrantedAuthority("USER"))
+//        );
+//
+//        return jwtTokenProvider.generateToken(userId, false);
+//    }
+
 
 
 
@@ -174,7 +191,7 @@ public class AuthHandler {
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .bodyValue("grant_type=authorization_code&client_id=e2iaB9q3A_kk1k7hX6Qi" +
                         "&client_secret=Av6eAE_PsV&code=" + code + "&state=" + state +
-                        "&redirect_uri=http://localhost:8000/auth/oauth2/code/naver")
+                        "&redirect_uri=http://localhost:8000/api/auth/oauth2/code/naver")
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {});  // 제네릭 타입 명시
     }
@@ -196,6 +213,5 @@ public class AuthHandler {
                     return Mono.error(new RuntimeException("Invalid user info response"));
                 });
     }
-
 
 }

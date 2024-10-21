@@ -54,7 +54,7 @@ services:
       - nyamnyam-kr
 
   chat:
-    hostname: chat-service
+    hostname: chat
     build:
       context: ./service/chat-service
       dockerfile: Dockerfile

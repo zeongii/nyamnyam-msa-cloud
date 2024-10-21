@@ -18,8 +18,8 @@ public class AuthRouter {
     public RouterFunction<ServerResponse> authRoutes() {
         return RouterFunctions.route()
                 .POST("/auth/login", authHandler::login)
-//                .POST("/auth/refresh", authHandler::refreshToken)
-//                .POST("/auth/logout", authHandler::logout)
+                .POST("/auth/refresh", authHandler::refreshToken)
+                .POST("/auth/logout", authHandler::logout)
                 .GET("/auth/oauth2/code/naver", authHandler::handleNaverCallback)
                 .GET("/auth/oauth2/authorization/naver", authHandler::redirectToNaverLogin)
                 .build();

@@ -27,7 +27,7 @@ public class CustomServerAuthenticationSuccessHandler implements ServerAuthentic
 //        log.info("Authorities 정보:" + authentication.getAuthorities());
 //        log.info("Credentials 정보:" + authentication.getCredentials());
 //
-//        if (requestPath.startsWith("/auth/Oauth")) {
+//        if (requestPath.startsWith("/auth/login")) {
 //
 //            exchange.getExchange().getResponse().setStatusCode(HttpStatus.FOUND);
 //            exchange.getExchange().getResponse().getHeaders().setLocation(URI.create("http://localhost:3000"));
