@@ -14,8 +14,7 @@ java {
 }
 
 bootJar {
-	enabled = true
-	mainClass = 'kr.configserver'
+    enabled = true
 }
 
 repositories {

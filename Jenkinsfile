@@ -4,7 +4,7 @@ pipeline {
     environment {
         repository = "zeongiii/nyamnyam-config-server"
         DOCKERHUB_CREDENTIALS = credentials('DockerHub')
-        dockerImage = ''
+        dockerImage = "whdcks420/lunch:3.0"
     }
 
     stages {
@@ -32,7 +32,7 @@ pipeline {
         stage('Build-image') {
             steps {
                 script {
-                    sh "docker build -t whdcks420/lunch:3.0 ."
+                    sh "docker build -t ${dockerImage} ."
                 }
             }
         }
@@ -40,14 +40,14 @@ pipeline {
         stage('Docker Push') {
             steps {
                 script {
-                    sh 'docker push whdcks420/lunch:3.0'
+                    sh "docker push ${dockerImage}"
                 }
             }
         }
 
         stage('Cleaning up') {
             steps {
-                sh "docker rmi whdcks420/lunch:3.0"
+                sh "docker rmi ${dockerImage}"
             }
         }
     }
