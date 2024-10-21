@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout SCM') {
             steps {
                 script {
-                    dir('nyamnyam.kr.server.config-server') {
+                    dir('nyamnyam.kr.server') {
                         checkout scm
                     }
                 }
