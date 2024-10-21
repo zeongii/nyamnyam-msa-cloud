@@ -1,53 +1,46 @@
 pipeline {
     agent any
-
     environment {
-        repository = "zeongiii/nyamnyam-config-server"
-        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
-        dockerImage = "whdcks420/lunch:3.0"
+        DOCKER = 'sudo docker'
     }
 
     stages {
-        stage('git scm update') {
+        stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/zeongii/nyamnyam-msa-cloud.git', branch: 'main'
+                checkout scm
+                echo 'Checkout Scm'
             }
         }
 
-        stage('Grant execute permissions') {
+        stage('Build image') {
             steps {
-                // gradlew 파일에 실행 권한 부여
-                sh 'chmod +x gradlew'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                dir("./") {
-                    sh "./gradlew clean build --stacktrace"
+                sh 'ls -al'
+                dir('docker') {
+                    sh 'ls -al'
+                    sh 'chmod +x ./gradlew'
+                    sh './gradlew build'
+                    sh 'docker build -t zeongiii/nyamnyam-config-server .'
                 }
+                echo 'Build image...'
             }
         }
 
-        stage('Build-image') {
+        stage('Remove Previous image') {
             steps {
                 script {
-                    sh "docker build -t ${dockerImage} ."
+                    try {
+                        h 'docker stop nyamnyam-config-server'
+                        sh 'docker rm nyamnyam-config-server'
+                    } catch (e) {
+                        echo 'fail to stop and remove container'
+                    }
                 }
             }
         }
-
-        stage('Docker Push') {
+        stage('Run New image') {
             steps {
-                script {
-                    sh "docker push ${dockerImage}"
-                }
-            }
-        }
-
-        stage('Cleaning up') {
-            steps {
-                sh "docker rmi ${dockerImage}"
+                sh 'docker run --name zeongiii/nyamnyam-config-server -d -p 8080:8080 zeongiii/nyamnyam-config-server'
+                echo 'Run New member image'
             }
         }
     }
