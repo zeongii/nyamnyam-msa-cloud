@@ -5,11 +5,16 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'zeongiii'
         DOCKER_IMAGE_PREFIX = 'zeongiii/nyamnyam'
     }
-
-    stage('Check Directory Structure') {
-        steps {
-            sh 'ls -R' // 모든 하위 디렉토리와 파일을 재귀적으로 출력
-        }
+    stages {
+            stage('Checkout SCM') {
+                steps {
+                    script {
+                        dir('nyamnyam.kr.server.config-server') {
+                            checkout scm
+                        }
+                    }
+                }
+            }
     }
 
     stages {
