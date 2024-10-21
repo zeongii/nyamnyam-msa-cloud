@@ -37,67 +37,68 @@ pipeline {
                 }
             }
         }
+    }
 
-        stage('Test') {
-            steps {
+    stage('Test') {
+        steps {
                 script {
-                    def SERVICES = [
-                        'server-config-server',
-                        'server-gateway-server',
-                        'service-admin-service',
-                        'service-chat-service',
-                        'service-post-service',
-                        'service-restaurant-service',
-                        'service-user-service'
-                    ]
+                def SERVICES = [
+                    'server-config-server',
+                    'server-gateway-server',
+                    'service-admin-service',
+                    'service-chat-service',
+                    'service-post-service',
+                    'service-restaurant-service',
+                    'service-user-service'
+                ]
 
-                    for (service in SERVICES) {
-                        sh "cd ${service} && ./gradlew test"
-                    }
+                for (service in SERVICES) {
+                    sh "cd ${service} && ./gradlew test"
                 }
             }
         }
+    }
 
-        stage('Docker Build & Push') {
-            steps {
-                script {
-                    def SERVICES = [
-                        'server-config-server',
-                        'server-gateway-server',
-                        'service-admin-service',
-                        'service-chat-service',
-                        'service-post-service',
-                        'service-restaurant-service',
-                        'service-user-service'
-                    ]
+    stage('Docker Build & Push') {
+        steps {
+            script {
+                def SERVICES = [
+                    'server-config-server',
+                    'server-gateway-server',
+                    'service-admin-service',
+                    'service-chat-service',
+                    'service-post-service',
+                    'service-restaurant-service',
+                    'service-user-service'
+                ]
 
-                    for (service in SERVICES) {
-                        // Docker 이미지 빌드 및 푸시
-                        sh "cd ${service} && docker build -t ${DOCKER_IMAGE_PREFIX}-${service}:latest ."
-                        sh "cd ${service} && docker push ${DOCKER_IMAGE_PREFIX}-${service}:latest"
-                    }
+                for (service in SERVICES) {
+                    // Docker 이미지 빌드 및 푸시
+                    sh "cd ${service} && docker build -t ${DOCKER_IMAGE_PREFIX}-${service}:latest ."
+                    sh "cd ${service} && docker push ${DOCKER_IMAGE_PREFIX}-${service}:latest"
                 }
             }
         }
+    }
 
-        stage('Deploy') {
-            steps {
-                script {
-                    def SERVICES = [
-                        'server-config-server',
-                        'server-gateway-server',
-                        'service-admin-service',
-                        'service-chat-service',
-                        'service-post-service',
-                        'service-restaurant-service',
-                        'service-user-service'
-                    ]
+    stage('Deploy') {
+        steps {
+            script {
+                def SERVICES = [
+                    'server-config-server',
+                    'server-gateway-server',
+                    'service-admin-service',
+                    'service-chat-service',
+                    'service-post-service',
+                    'service-restaurant-service',
+                    'service-user-service'
+                ]
 
-                    // 각 서비스에 대한 배포 작업 정의
-                    for (service in SERVICES) {
-                        sh "kubectl apply -f k8s/${service}/deployment.yaml"
-                    }
+                // 각 서비스에 대한 배포 작업 정의
+                for (service in SERVICES) {
+                    sh "kubectl apply -f k8s/${service}/deployment.yaml"
                 }
+
             }
         }
     }
