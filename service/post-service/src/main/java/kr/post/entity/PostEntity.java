@@ -43,14 +43,17 @@ public class PostEntity {
         this.modifyDate = LocalDateTime.now();
     }
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<PostTagEntity> postTags = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<ImageEntity> images = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<ReportEntity> reportEntities = new ArrayList<>();
