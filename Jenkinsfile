@@ -38,10 +38,38 @@ pipeline {
                     // 각 서버에 대해 gradlew를 실행
                     dir('nyamnyam.kr') {
                         sh 'chmod +x gradlew' // gradlew에 실행 권한 부여
-                        sh './gradlew clean build'
+
+                        // config-server 빌드
+                        dir('server/config-server') {
+                            sh '../../gradlew clean build'
+                        }
+                        // eureka-server 빌드
+                        dir('server/eureka-server') {
+                            sh '../../gradlew clean build'
+
+                        }
+                        // gateway-server 빌드
+                        dir('server/gateway-server') {
+                            sh '../../gradlew clean build'
+
+                        }
                     }
                 }
             }
         }
+
+        stage('Build Other Microservices') {
+             steps {
+                sh './gradlew -p nyamnyam.kr/service/admin-service build'
+                sh './gradlew -p nyamnyam.kr/service/chat-service build'
+                sh './gradlew -p nyamnyam.kr/service/post-service build'
+                sh './gradlew -p nyamnyam.kr/service/restaurant-service build'
+                sh './gradlew -p nyamnyam.kr/service/user-service build'
+             }
+        }
+
+
+
+
     }
 }
