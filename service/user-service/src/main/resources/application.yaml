@@ -4,4 +4,4 @@ spring:
   profiles:
     active: prod
   config:
-    import: optional:configserver:http://211.188.201.22:8888
+    import: optional:configserver:http://211.188.55.210:8888
