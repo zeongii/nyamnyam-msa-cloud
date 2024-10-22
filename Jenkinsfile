@@ -46,16 +46,29 @@ pipeline {
             }
         }
 
-        stage('Run JAR') {
+        stage('Get JAR Name') {
             steps {
                 script {
                     dir('nyamnyam.kr/server/config-server/build/libs') {
-                        // JAR 파일 실행 (실제 JAR 파일 이름으로 변경)
-                        sh 'java -jar <생성된_jar파일명>.jar &'
+                        // JAR 파일 이름 확인
+                        def jarFile = sh(script: 'ls -1 *.jar', returnStdout: true).trim()
+                        echo "Generated JAR file: ${jarFile}"
                     }
                 }
             }
         }
+
+        stage('Run JAR') {
+            steps {
+                script {
+                    dir('nyamnyam.kr/server/config-server/build/libs') {
+                        // JAR 파일 실행
+                        sh "java -jar ${jarFile} &"
+                    }
+                }
+            }
+        }
+
 
 
 
