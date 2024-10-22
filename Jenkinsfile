@@ -37,19 +37,20 @@ pipeline {
                 script {
                     // 각 서버에 대해 gradlew를 실행
                     dir('nyamnyam.kr') {
-                        sh 'chmod +x gradlew' // gradlew에 실행 권한 부여
+                        // gradlew에 실행 권한 부여
+                        sh 'chmod +x gradlew'
 
                         // config-server 빌드
                         dir('server/config-server') {
-                            sh './gradlew clean build'
+                            sh '../gradlew clean build' // gradlew를 한 단계 위에서 호출
                         }
                         // eureka-server 빌드
                         dir('server/eureka-server') {
-                            sh './gradlew clean build'
+                            sh '../gradlew clean build'
                         }
                         // gateway-server 빌드
                         dir('server/gateway-server') {
-                            sh './gradlew clean build'
+                            sh '../gradlew clean build'
                         }
                     }
                 }
