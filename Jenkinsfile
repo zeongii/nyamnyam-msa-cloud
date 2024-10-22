@@ -31,53 +31,33 @@ pipeline {
             }
         }
 
-
         stage('Build JAR') {
             steps {
                 script {
-                    // 각 서버에 대해 gradlew를 실행
                     dir('nyamnyam.kr') {
                         sh 'chmod +x gradlew' // gradlew에 실행 권한 부여
 
-                        // config-server 빌드
-                        dir('server/config-server') {
-                            sh '../../gradlew clean build'
-                        }
-                        // eureka-server 빌드
-                        dir('server/eureka-server') {
-                            sh '../../gradlew clean build'
+                        // 각 서버에 대해 gradlew를 실행하고, --warning-mode all 옵션 추가
+                        def services = [
+                            'server/config-server',
+                            'server/eureka-server',
+                            'server/gateway-server',
+                            'service/admin-service',
+                            'service/chat-service',
+                            'service/post-service',
+                            'service/restaurant-service',
+                            'service/user-service'
+                        ]
 
-                        }
-
-                        // gateway-server 빌드
-                        dir('server/gateway-server') {
-                            sh '../../gradlew clean build'
-
-                        }
-
-                        dir('service/admin-service') {
-                            sh '../../gradlew clean build'
-
-                        }
-
-                        dir('service/chat-service') {
-                            sh '../../gradlew clean build'
-
-                        }
-
-                        dir('service/post-service') {
-                            sh '../../gradlew clean build'
-
-                        }
-
-                        dir('service/restaurant-service') {
-                            sh '../../gradlew clean build'
-
-                        }
-
-                        dir('service/user-service') {
-                            sh '../../gradlew clean build'
-
+                        for (service in services) {
+                            dir(service) {
+                                sh "../../gradlew clean build --warning-mode all"
+                                // 테스트 실행 및 실패 시 처리
+                                def testResult = sh(script: "../../gradlew test", returnStatus: true)
+                                if (testResult != 0) {
+                                    error "Tests failed for ${service}"
+                                }
+                            }
                         }
                     }
                 }
