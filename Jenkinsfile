@@ -60,11 +60,13 @@ pipeline {
 
         stage('Build Other Microservices') {
              steps {
-                sh './gradlew -p nyamnyam.kr/service/admin-service build'
-                sh './gradlew -p nyamnyam.kr/service/chat-service build'
-                sh './gradlew -p nyamnyam.kr/service/post-service build'
-                sh './gradlew -p nyamnyam.kr/service/restaurant-service build'
-                sh './gradlew -p nyamnyam.kr/service/user-service build'
+                dir ('nyamnyam.kr') {
+                    sh './gradlew -p nyamnyam.kr/service/admin-service build'
+                    sh './gradlew -p nyamnyam.kr/service/chat-service build'
+                    sh './gradlew -p nyamnyam.kr/service/post-service build'
+                    sh './gradlew -p nyamnyam.kr/service/restaurant-service build'
+                    sh './gradlew -p nyamnyam.kr/service/user-service build'
+                }
              }
         }
 
