@@ -2,7 +2,6 @@ package kr.user.serviceImpl;
 
 import kr.user.document.User;
 import kr.user.repository.UserRepository;
-import kr.user.service.TokenService;
 import kr.user.service.UserService;
 import kr.user.service.UserThumbnailService;
 import lombok.RequiredArgsConstructor;
