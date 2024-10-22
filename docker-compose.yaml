@@ -1,6 +1,6 @@
 services:
   eureka:
-    hostname: eureka
+    hostname: eureka-server
     build:
       context: ./server/eureka-server
       dockerfile: Dockerfile
