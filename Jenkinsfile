@@ -48,8 +48,34 @@ pipeline {
                             sh '../../gradlew clean build'
 
                         }
+
                         // gateway-server 빌드
                         dir('server/gateway-server') {
+                            sh '../../gradlew clean build'
+
+                        }
+
+                        dir('service/admin-service') {
+                            sh '../../gradlew clean build'
+
+                        }
+
+                        dir('service/chat-service') {
+                            sh '../../gradlew clean build'
+
+                        }
+
+                        dir('service/post-service') {
+                            sh '../../gradlew clean build'
+
+                        }
+
+                        dir('service/restaurant-service') {
+                            sh '../../gradlew clean build'
+
+                        }
+
+                        dir('service/user-service') {
                             sh '../../gradlew clean build'
 
                         }
@@ -57,21 +83,5 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Other Microservices') {
-             steps {
-                dir ('nyamnyam.kr') {
-                    sh './gradlew -p nyamnyam.kr/service/admin-service build'
-                    sh './gradlew -p nyamnyam.kr/service/chat-service build'
-                    sh './gradlew -p nyamnyam.kr/service/post-service build'
-                    sh './gradlew -p nyamnyam.kr/service/restaurant-service build'
-                    sh './gradlew -p nyamnyam.kr/service/user-service build'
-                }
-             }
-        }
-
-
-
-
     }
 }
