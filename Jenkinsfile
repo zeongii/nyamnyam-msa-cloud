@@ -35,6 +35,30 @@ pipeline {
             }
         }
 
+
+        stage('Build JAR') {
+            steps {
+                script {
+                    dir('nyamnyam.kr/server/config-server') {
+                        sh './gradlew clean build'
+                    }
+                }
+            }
+        }
+
+        stage('Run JAR') {
+            steps {
+                script {
+                    dir('nyamnyam.kr/server/config-server/build/libs') {
+                        // JAR 파일 실행 (실제 JAR 파일 이름으로 변경)
+                        sh 'java -jar <생성된_jar파일명>.jar &'
+                    }
+                }
+            }
+        }
+
+
+
         stage('Docker Build & Push') {
             steps {
                 script {
