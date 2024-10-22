@@ -31,11 +31,9 @@ pipeline {
             }
         }
 
-
         stage('Build JAR') {
             steps {
                 script {
-                    // 각 서버에 대해 gradlew를 실행
                     dir('nyamnyam.kr') {
                         sh 'chmod +x gradlew' // gradlew에 실행 권한 부여
 
@@ -46,60 +44,39 @@ pipeline {
                         // eureka-server 빌드
                         dir('server/eureka-server') {
                             sh '../../gradlew clean build'
-
                         }
                         // gateway-server 빌드
                         dir('server/gateway-server') {
                             sh '../../gradlew clean build'
-
                         }
                     }
                 }
             }
         }
 
-
         stage('Build MSA JAR') {
-                    steps {
-                        script {
-                            // 각 서버에 대해 gradlew를 실행
-                            dir('nyamnyam.kr') {
-                                dir('service/admin-service') {
-                                    sh '../../gradlew clean build'
-                                }
-                                dir('service/chat-service') {
-                                    sh '../../gradlew clean build'
-                                }
-                                dir('service/user-service') {
-                                    sh '../../gradlew clean build'
-                                }
-                                dir('service/post-service') {
-                                    sh '../../gradlew clean build'
-                                }
-                                dir('service/restaurant-service') {
-                                    sh '../../gradlew clean build'
-                                }
-
-                            }
+            steps {
+                script {
+                    dir('nyamnyam.kr') {
+                        dir('service/admin-service') {
+                            sh '../../gradlew clean build'
+                        }
+                        dir('service/chat-service') {
+                            sh '../../gradlew clean build'
+                        }
+                        dir('service/user-service') {
+                            sh '../../gradlew clean build'
+                        }
+                        dir('service/post-service') {
+                            sh '../../gradlew clean build'
+                        }
+                        dir('service/restaurant-service') {
+                            sh '../../gradlew clean build'
                         }
                     }
+                }
+            }
         }
-         stage('Build JAR') {
-                    steps {
-                        script {
-                            sh 'chmod +x gradlew'
 
-                            // services 환경 변수를 Groovy 리스트로 변환
-                            def servicesList = env.services.split(',')
-
-                            // 각 서비스에 대해 Gradle 빌드 수행 (테스트 제외)
-                            servicesList.each { service ->
-                                dir(service) {
-                                    sh "../../gradlew clean build --warning-mode all -x test"
-                                }
-                            }
-                        }
-                    }
-         }
     }
 }
