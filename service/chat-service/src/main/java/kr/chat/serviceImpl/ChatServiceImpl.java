@@ -51,12 +51,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Flux<Chat> mFindBySender(String sender, String chatRoomId) {
-        return chatRepository.mFindBySender(sender, chatRoomId)
-                .subscribeOn(Schedulers.boundedElastic());
-    }
-
-    @Override
     public Flux<Chat> mFindByChatRoomId(String chatRoomId) {
         return chatRepository.mFindByChannelId(chatRoomId)
                 .subscribeOn(Schedulers.boundedElastic());
