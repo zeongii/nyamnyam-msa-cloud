@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        stage('Build JAR') {
+        stage('Build and Test JARs') {
             steps {
                 script {
                     dir('nyamnyam.kr') {
@@ -51,11 +51,15 @@ pipeline {
 
                         for (service in services) {
                             dir(service) {
+                                // 빌드 실행 및 경고 모드 활성화
                                 sh "../../gradlew clean build --warning-mode all"
+
                                 // 테스트 실행 및 실패 시 처리
-                                def testResult = sh(script: "../../gradlew test", returnStatus: true)
+                                def testResult = sh(script: "../../gradlew test --warning-mode all", returnStatus: true)
                                 if (testResult != 0) {
                                     error "Tests failed for ${service}"
+                                } else {
+                                    echo "Tests passed for ${service}"
                                 }
                             }
                         }
