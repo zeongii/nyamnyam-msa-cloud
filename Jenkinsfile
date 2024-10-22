@@ -35,13 +35,17 @@ pipeline {
         stage('Build JAR') {
             steps {
                 script {
-                    dir('nyamnyam.kr') {
+                    dir('nyamnyam.kr/server/config-server') {
                         sh 'chmod +x gradlew'
-                        sh 'cd nyamnyam.kr/server/config-server && ./gradlew build'
-                        sh 'cd nyamnyam.kr/server/eureka-server && ./gradlew build'
-                         sh 'cd nyamnyam.kr/server/gateway-server && ./gradlew build'
-
-
+                        sh './gradlew clean build'
+                    }
+                    dir('nyamnyam.kr/server/eureka-server') {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew clean build'
+                    }
+                    dir('nyamnyam.kr/server/gateway-server') {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew clean build'
                     }
                 }
             }
