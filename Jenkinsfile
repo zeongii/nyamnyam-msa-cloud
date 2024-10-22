@@ -5,7 +5,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'zeongiii'
         DOCKER_IMAGE_PREFIX = 'zeongiii/nyamnyam-config-server'
         services = "server/config-server,server/eureka-server,server/gateway-server,service/admin-service,service/chat-service,service/post-service,service/restaurant-service,service/user-service"
-
+        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
     }
 
     stages {
@@ -71,13 +71,20 @@ pipeline {
             }
         }
 
+
+         stage('Login to Docker Hub') {
+                    steps {
+                        sh '''
+                        echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                        '''
+                    }
+         }
+
+
+
         stage('Docker Push') {
             steps {
                 script {
-                    // Docker Hub 로그인
-                    withCredentials([usernamePassword(credentialsId: DockerHub, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
-                    }
 
                     def servicesList = env.services.split(',')
 
