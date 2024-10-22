@@ -9,7 +9,7 @@ services:
     ports:
       - "8761:8761"
     networks:
-      - nyamnyam
+      - nyamnyam-kr
     healthcheck:
       test: ["CMD-SHELL", "curl -sS http://localhost:8761/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
@@ -17,19 +17,19 @@ services:
       retries: 5
 
   gateway:
-    hostname: gateway
+    hostname: gateway-server
     build:
       context: ./server/gateway-server
       dockerfile: Dockerfile
-    image: nyamnyam/gateway:latest
-    container_name: gateway
+    image: nyamnyam/gateway-server:latest
+    container_name: gateway-server
     ports:
       - "8000:8000"
     depends_on:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam
+      - nyamnyam-kr
     healthcheck:
       test: ["CMD-SHELL", "curl -sS http://localhost:8000/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
@@ -37,12 +37,12 @@ services:
       retries: 5
 
   admin:
-    hostname: admin
+    hostname: admin-service
     build:
       context: ./service/admin-service
       dockerfile: Dockerfile
-    image: nyamnyam/admin:latest
-    container_name: admin
+    image: nyamnyam/admin-service:latest
+    container_name: admin-service
     ports:
       - "8001:8001"
     depends_on:
@@ -51,15 +51,15 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam
+      - nyamnyam-kr
 
   chat:
-    hostname: chat
+    hostname: chat-service
     build:
       context: ./service/chat-service
       dockerfile: Dockerfile
-    image: nyamnyam/chat:latest
-    container_name: chat
+    image: nyamnyam/chat-service:latest
+    container_name: chat-service
     ports:
       - "8002:8002"
     depends_on:
@@ -68,15 +68,15 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam
+      - nyamnyam-kr
 
   post:
-    hostname: post
+    hostname: post-service
     build:
       context: ./service/post-service
       dockerfile: Dockerfile
-    image: nyamnyam/post:latest
-    container_name: post
+    image: nyamnyam/post-service:latest
+    container_name: post-service
     ports:
       - "8003:8003"
     depends_on:
@@ -85,15 +85,15 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam
+      - nyamnyam-kr
 
   restaurant:
-    hostname: restaurant
+    hostname: restaurant-service
     build:
       context: ./service/restaurant-service
       dockerfile: Dockerfile
-    image: nyamnyam/restaurant:latest
-    container_name: restaurant
+    image: nyamnyam/restaurant-service:latest
+    container_name: restaurant-service
     ports:
       - "8004:8004"
     depends_on:
@@ -102,16 +102,16 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam
+      - nyamnyam-kr
 
 
   user:
-    hostname: user
+    hostname: user-service
     build:
       context: ./service/user-service
       dockerfile: Dockerfile
-    image: nyamnyam/user:latest
-    container_name: user
+    image: nyamnyam/user-service:latest
+    container_name: user-service
     ports:
       - "8005:8005"
     depends_on:
@@ -120,8 +120,8 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam
+      - nyamnyam-kr
 
 networks:
-  nyamnyam:
+  nyamnyam-kr:
     driver: bridge
