@@ -35,19 +35,15 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.3.4'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '3.3.4'
     // spring webflux
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.3.4'
+    //implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.3.4'
     // spring cloud
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-gateway', version: '4.0.0'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-circuitbreaker-reactor-resilience4j', version: '3.1.2'
-
-    implementation 'org.springframework.cloud:spring-cloud-starter-config'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-    // actuator
+
     // prometheus
     implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.13.4'
     // spring doc
@@ -64,6 +60,10 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 }
 
 tasks.named('test') {

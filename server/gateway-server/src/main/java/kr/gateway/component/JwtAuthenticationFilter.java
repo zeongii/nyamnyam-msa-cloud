@@ -1,4 +1,4 @@
-//package kr.gateway.config;
+package kr.gateway.component;//package kr.gateway.config;
 //
 //import kr.gateway.service.AuthService; // 새롭게 AuthService로 통합
 //import lombok.RequiredArgsConstructor;

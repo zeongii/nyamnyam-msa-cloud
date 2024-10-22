@@ -80,9 +80,6 @@ public class JwtTokenProvider {
         return Mono.just(token);
     }
 
-    public long accessTokenExpiration() {
-        return accessTokenExpiration;
-    }
 
     public Mono<String> refreshToken(String oldToken) {
 
