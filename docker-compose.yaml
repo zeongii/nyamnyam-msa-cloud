@@ -123,5 +123,5 @@ services:
       - nyamnyam-kr
 
 networks:
-  nyamnyam-kr:
-    driver: bridge
+  nyamnyam-kr:  # 네트워크 정의 추가
+    driver: bridge  # 필요한 경우 드라이버 지정

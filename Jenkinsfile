@@ -53,12 +53,15 @@ pipeline {
                 }
             }
         }
-        stage('Compose Up') {  // docker-compose up을 실행하는 단계
+        stage('Build Docker Images') {
                     steps {
                         script {
                             dir('nyamnyam.kr') {
-                                // docker-compose.yaml 파일이 있는 디렉토리에서 compose up 실행
-                                sh 'docker-compose up -d'
+                                sh "cd server/config-server && docker build -t zeongiii/nyamnyam-config-server:latest ."
+                            }
+
+                            dir('nyamnyam.kr') {
+                                sh "docker-compose up --build -d"
                             }
                         }
                     }
