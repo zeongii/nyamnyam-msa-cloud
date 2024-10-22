@@ -35,7 +35,6 @@ public class RestaurantEntity {
     @Column(length = 500)
     private String subImageUrl;
 
-    @Builder.Default
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<PostEntity> posts = new ArrayList<>();

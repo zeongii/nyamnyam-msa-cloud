@@ -22,7 +22,6 @@ public class TagEntity {
     @Enumerated(EnumType.STRING)
     private TagCategory tagCategory;
 
-    @Builder.Default
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<PostTagEntity> postTags = new ArrayList<>();
