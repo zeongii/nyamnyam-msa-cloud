@@ -36,28 +36,6 @@ pipeline {
         stage('Build JAR') {
             steps {
                 script {
-                        sh 'chmod +x gradlew' // gradlew에 실행 권한 부여
-
-                        // config-server 빌드
-                        dir('server/config-server') {
-                            sh '../../gradlew clean build'
-                        }
-                        // eureka-server 빌드
-                        dir('server/eureka-server') {
-                            sh '../../gradlew clean build'
-                        }
-                        // gateway-server 빌드
-                        dir('server/gateway-server') {
-                            sh '../../gradlew clean build'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Build JAR') {
-            steps {
-                script {
                     dir('nyamnyam.kr') {
 
                         sh 'chmod +x gradlew'
