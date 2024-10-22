@@ -9,62 +9,84 @@ pipeline {
     }
 
     stages {
-        stage('Checkout SCM') {
-            steps {
-                script {
-                    dir('nyamnyam.kr') {
-                        checkout scm
+            stage('Checkout SCM') {
+                steps {
+                    script {
+                        dir('nyamnyam.kr') {
+                            checkout scm
+                        }
                     }
                 }
             }
-        }
+             stage('Git Clone') {
+                        steps {
+                            script {
+                            sh 'pwd'
 
-        stage('Git Clone') {
-            steps {
-                script {
-                    dir('nyamnyam.kr/server/config-server') {
-                        git branch: 'main', url: 'https://github.com/zeongii/nyamnyam-config-server.git', credentialsId: 'githubToken'
-                    }
+                                dir('nyamnyam.kr/server/config-server') {
+                                    git branch: 'main', url: 'https://github.com/alrk14567/nyamnyam-config-server.git', credentialsId: 'github_nyamnyam_access_token'
+                                }
 
-                    dir ('nyamnyam.kr/server/config-server/src/main/resources/secret-server') {
-                        git branch: 'main', url: 'https://github.com/zeongii/nyamnyam-secret-server.git', credentialsId: 'githubToken'
-                    }
-                }
-            }
-        }
+                                dir ('nyamnyam.kr/server/config-server/src/main/resources/secret-server') {
+                                    git branch: 'main', url: 'https://github.com/alrk14567/nyamnyam-secret-server.git', credentialsId: 'github_nyamnyam_access_token'
+
+                                }
+                            }
+                        }
+             }
+
+
 
         stage('Build JAR') {
+                   steps {
+                       script {
+                           // 각 서버에 대해 gradlew를 실행
+                           dir('nyamnyam.kr') {
+                               sh 'chmod +x gradlew' // gradlew에 실행 권한 부여
+
+                               // services 환경 변수를 Groovy 리스트로 변환
+                               def servicesList = env.services.split(',')
+
+
+                               servicesList.each { service ->
+                                   dir(service) {
+                                       // ./gradlew clean bootJar 명령어 실행
+                                       sh "../../gradlew clean bootJar"
+                                   }
+                               }
+                           }
+                       }
+
+                   }
+        }
+
+        stage('Build Docker Images') {
             steps {
                 script {
                     dir('nyamnyam.kr') {
+                        sh "cd server/config-server && docker build -t alrk/nyam-config-server:latest ."
+                    }
 
-                        sh 'chmod +x gradlew'
-
-                        // services 환경 변수를 Groovy 리스트로 변환
-                        def servicesList = env.services.split(',')
-
-                        // 각 서비스에 대해 Gradle 빌드 수행 (테스트 제외)
-                        servicesList.each { service ->
-                            dir(service) {
-                                sh "../../gradlew clean build --warning-mode all -x test"
-                            }
-                        }
+                    dir('nyamnyam.kr') {
+                        sh "docker-compose build"
                     }
                 }
             }
         }
-        stage('Build Docker Images') {
-                    steps {
-                        script {
-                            dir('nyamnyam.kr') {
-                                sh "cd server/config-server && docker build -t zeongiii/nyamnyam-config-server:latest ."
-                            }
 
-                            dir('nyamnyam.kr') {
-                                sh "docker-compose up -d"
-                            }
-                        }
-                    }
+        stage('Docker Push') {
+            steps {
+                script {
+                    sh 'docker push ${repository}:latest' // Push the correct repository
+                }
+            }
+        }
+
+        stage('Cleaning up') {
+            steps {
+                sh "docker rmi ${repository}:latest" // Clean up the pushed image
+            }
         }
     }
+
 }
