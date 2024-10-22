@@ -57,5 +57,32 @@ pipeline {
                 }
             }
         }
+
+
+        stage('Build MSA JAR') {
+                    steps {
+                        script {
+                            // 각 서버에 대해 gradlew를 실행
+                            dir('nyamnyam.kr') {
+                                dir('service/admin-service') {
+                                    sh '../../gradlew clean build'
+                                }
+                                dir('service/chat-service') {
+                                    sh '../../gradlew clean build'
+                                }
+                                dir('service/user-service') {
+                                    sh '../../gradlew clean build'
+                                }
+                                dir('service/post-service') {
+                                    sh '../../gradlew clean build'
+                                }
+                                dir('service/restaurant-service') {
+                                    sh '../../gradlew clean build'
+                                }
+
+                            }
+                        }
+                    }
+        }
     }
 }
