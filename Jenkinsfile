@@ -53,5 +53,15 @@ pipeline {
                 }
             }
         }
+        stage('Compose Up') {  // docker-compose up을 실행하는 단계
+                    steps {
+                        script {
+                            dir('nyamnyam.kr') {
+                                // docker-compose.yaml 파일이 있는 디렉토리에서 compose up 실행
+                                sh 'docker-compose up -d'
+                            }
+                        }
+                    }
+        }
     }
 }
