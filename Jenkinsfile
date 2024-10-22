@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout SCM') {
             steps {
                 script {
-                    dir('nyamnyam.kr.server') {
+                    dir('nyamnyam.kr') {
                         checkout scm
                     }
                 }
@@ -20,7 +20,7 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    dir('nyamnyam.kr.server.config-server') {
+                    dir('nyamnyam.kr') {
                         sh 'pwd'
                         // Docker 빌드 및 푸시 명령어 추가
                         sh "docker build -t ${DOCKER_IMAGE_PREFIX}/config-server:latest ."
@@ -29,5 +29,16 @@ pipeline {
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
     }
 }
