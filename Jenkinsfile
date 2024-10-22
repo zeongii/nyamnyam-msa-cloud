@@ -74,16 +74,29 @@ pipeline {
         stage('Docker Push') {
             steps {
                 script {
-                    sh 'docker push ${repository}:latest' // Push the correct repository
+                    def servicesList = env.services.split(',')
+
+                    servicesList.each { service ->
+                        def serviceName = service.split('/')[1] // 서비스 이름 추출
+                        // 각 서비스의 Docker 이미지를 푸시
+                        sh "docker push ${DOCKER_IMAGE_PREFIX}/${serviceName}:latest"
+                    }
                 }
             }
         }
 
+
         stage('Cleaning up') {
             steps {
-                sh "docker rmi ${repository}:latest" // Clean up the pushed image
+                script {
+                    // 각 서비스의 이미지 삭제
+                    def servicesList = env.services.split(',')
+                    servicesList.each { service ->
+                        def serviceName = service.split('/')[1] // 서비스 이름 추출
+                        sh "docker rmi ${DOCKER_IMAGE_PREFIX}/${serviceName}:latest" // Clean up the pushed image
+                    }
+                }
             }
         }
     }
-
 }
