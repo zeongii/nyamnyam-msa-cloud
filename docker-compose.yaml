@@ -69,6 +69,11 @@ services:
         condition: service_healthy
     networks:
       - nyamnyam-kr
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sS http://localhost:8002/actuator/health | grep -q '\"status\":\"UP\"'" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   post:
     hostname: post-service
