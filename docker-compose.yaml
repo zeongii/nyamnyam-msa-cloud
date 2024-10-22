@@ -9,7 +9,7 @@ services:
     ports:
       - "8761:8761"
     networks:
-      - nyamnyam-kr
+      - nyamnyam
     healthcheck:
       test: ["CMD-SHELL", "curl -sS http://localhost:8761/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
@@ -29,7 +29,7 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam-kr
+      - nyamnyam
     healthcheck:
       test: ["CMD-SHELL", "curl -sS http://localhost:8000/actuator/health | grep -q '\"status\":\"UP\"'"]
       interval: 10s
@@ -51,7 +51,7 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam-kr
+      - nyamnyam
 
   chat:
     hostname: chat
@@ -68,7 +68,7 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam-kr
+      - nyamnyam
 
   post:
     hostname: post
@@ -85,7 +85,7 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam-kr
+      - nyamnyam
 
   restaurant:
     hostname: restaurant
@@ -102,7 +102,7 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam-kr
+      - nyamnyam
 
 
   user:
@@ -120,4 +120,4 @@ services:
       eureka:
         condition: service_healthy
     networks:
-      - nyamnyam-kr
+      - nyamnyam
