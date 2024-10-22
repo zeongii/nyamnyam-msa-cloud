@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     dir('nyamnyam.kr/server/config-server') {
-                        git branch: 'main', url: 'https://github.com/zeongii/nyamnyam-config-server.git'
+                        git branch: 'main', url: 'https://github.com/zeongii/nyamnyam-config-server.git', credentialsId: 'githubToken'
                     }
                 }
             }
