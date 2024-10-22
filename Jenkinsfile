@@ -5,7 +5,6 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'zeongiii'
         DOCKER_IMAGE_PREFIX = 'zeongiii/nyamnyam-config-server'
         services = "server/config-server,server/eureka-server,server/gateway-server,service/admin-service,service/chat-service,service/post-service,service/restaurant-service,service/user-service"
-
     }
 
     stages {
@@ -37,7 +36,6 @@ pipeline {
             steps {
                 script {
                     dir('nyamnyam.kr') {
-
                         sh 'chmod +x gradlew'
 
                         // services 환경 변수를 Groovy 리스트로 변환
@@ -53,18 +51,31 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker Images') {
-                    steps {
-                        script {
-                            dir('nyamnyam.kr') {
-                                sh "cd server/config-server && docker build -t zeongiii/nyamnyam-config-server:latest ."
-                            }
 
-                            dir('nyamnyam.kr') {
-                                sh "docker-compose up --build -d"
+        stage('Check and Build Docker Images') {
+            steps {
+                script {
+                    dir('nyamnyam.kr') {
+                        // 각 서비스에 대해 이미지를 빌드할지 체크
+                        def servicesList = env.services.split(',')
+                        servicesList.each { service ->
+                            def imageName = "${DOCKER_IMAGE_PREFIX}/${service.split('/').last()}:latest"
+
+                            // 이미지를 pull하여 존재 여부 확인
+                            def imageExists = sh(script: "docker images -q ${imageName}", returnStdout: true).trim()
+
+                            if (!imageExists) {
+                                sh "cd ${service} && docker build -t ${imageName} ."
+                            } else {
+                                echo "Image ${imageName} already exists. Skipping build."
                             }
                         }
+
+                        // docker-compose로 서비스 시작
+                        sh "docker-compose up -d"
                     }
+                }
+            }
         }
     }
 }
