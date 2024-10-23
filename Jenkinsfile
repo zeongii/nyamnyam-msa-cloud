@@ -10,6 +10,7 @@ pipeline {
 
     stages {
         stage('Checkout SCM') {
+        sh 'pwd'
             steps {
                 script {
                     dir('nyamnyam.kr') {
