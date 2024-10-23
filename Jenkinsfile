@@ -110,5 +110,25 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to K8s') {
+                    steps {
+                        script {
+                            // deploy.yaml 파일 수정
+                            sh "sed -i 's,TEST_IMAGE_NAME,${DOCKER_IMAGE_PREFIX}:latest,' deploy.yaml"
+                            sh "cat deploy.yaml"
+                            // Kubernetes에서 현재 Pod 상태 확인
+                            sh "kubectl --kubeconfig=/home/ec2-user/config get pods"
+                            // deploy.yaml을 Kubernetes에 적용
+                            sh "kubectl --kubeconfig=/home/ec2-user/config apply -f deploy.yaml"
+                        }
+                    }
+        }
+
+
+
+
+
+
     }
 }
