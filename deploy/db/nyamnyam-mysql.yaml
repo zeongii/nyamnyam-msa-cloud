@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nyamnyam-mysql
+  namespace: nyamnyam
+spec:
+  serviceName: nyamnyam-mysql-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nyamnyam-mysql
+  template:
+    metadata:
+      labels:
+        app: nyamnyam-mysql
+    spec:
+      containers:
+        - name: nyamnyam-mysql
+          image: mysql:8.0
+          # 실제 사용하는 이미지로 변경
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: mysql-password
+            - name: MYSQL_CHARACTER_SET_SERVER
+              value: "utf8mb4"
+            - name: MYSQL_COLLATION_SERVER
+              value: "utf8mb4_unicode_ci"
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          resources:
+            requests:
+              memory: "0Mi"
+              cpu: "0m"
+            limits:
+              memory: "500Mi"
+              cpu: "512m"
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: nyamnyam-mysql-pvc
+        - name: init-script
+          configMap:
+            name: db-init-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nyamnyam-mysql-service
+  namespace: nyamnyam
+spec:
+  selector:
+    app: nyamnyam-mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: LoadBalancer

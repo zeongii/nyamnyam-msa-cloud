@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-service
+  namespace: nyamnyam
+spec:
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: chat-service
+  template:
+    metadata:
+      labels:
+        app: chat-service
+    spec:
+      containers:
+        - name: chat-service
+          image: nyamnyam.kr/nyamnyam/chat-service:89
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 500m
+              memory: 250Mi
+            limits:
+              cpu: 1000m
+              memory: 1000Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+          env:
+            - name: SPRING_CONFIG_LOCATION
+              value: file:/app/config/application.properties
+      volumes:
+        - name: config-volume
+          configMap:
+            name: chat-service-config
+      imagePullSecrets:
+        - name: nyamnyam-regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-service
+  namespace: nyamnyam
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: chat-service

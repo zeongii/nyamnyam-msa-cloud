@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nyamnyam-mongodb
+  namespace: nyamnyam
+spec:
+  serviceName: nyamnyam-mongodb-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nyamnyam-mongodb
+  template:
+    metadata:
+      labels:
+        app: nyamnyam-mongodb
+    spec:
+      containers:
+        - name: nyamnyam-mongodb
+          image: mongo:4.2.24-bionic
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: mongodb-username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: mongodb-password
+            - name: MONGO_INITDB_DATABASE
+              value: "chatdb"
+          ports:
+            - containerPort: 27017
+              name: mongodb
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "512m"
+      volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: nyamnyam-mongodb-pvc
+        - name: init-scripts
+          configMap:
+            name: mongodb-init-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nyamnyam-mongodb-service
+  namespace: nyamnyam
+spec:
+  selector:
+    app: nyamnyam-mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: LoadBalancer

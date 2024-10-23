@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nyamnyam-mysql-pvc
+  namespace: nyamnyam
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi   # PV와 동일한 용량을 요청
+  volumeName: nyamnyam-mysql-pv

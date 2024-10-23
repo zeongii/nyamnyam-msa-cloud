@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: nyamnyam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: nyamnyam.kr/nyamnyam/user-service:206
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 0m
+              memory: 0Mi
+            limits:
+              cpu: 500m
+              memory: 800Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+          env:
+            - name: SPRING_CONFIG_LOCATION
+              value: file:/app/config/application.properties
+      volumes:
+        - name: config-volume
+          configMap:
+            name: user-service-config
+      imagePullSecrets:
+        - name: nyamnyam-regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: nyamnyam
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: user-service

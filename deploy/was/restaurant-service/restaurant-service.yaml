@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restaurant-service
+  namespace: nyamnyam
+spec:
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: restaurant-service
+  template:
+    metadata:
+      labels:
+        app: restaurant-service
+    spec:
+      containers:
+        - name: restaurant-service
+          image: nyamnyam.kr/nyamnyam/restaurant-service:68
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 0m
+              memory: 0Mi
+            limits:
+              cpu: 500m
+              memory: 800Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+          env:
+            - name: SPRING_CONFIG_LOCATION
+              value: file:/app/config/application.properties
+      volumes:
+        - name: config-volume
+          configMap:
+            name: restaurant-service-config
+      imagePullSecrets:
+        - name: nyamnyam-regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-service
+  namespace: nyamnyam
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: restaurant-service

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nyamnyam-nextjs
+  namespace: nyamnyam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nyamnyam-nextjs
+  template:
+    metadata:
+      labels:
+        app: nyamnyam-nextjs
+    spec:
+      containers:
+        - name: nyamnyam-nextjs
+          image: nyamnyam.kr/nyamnyam/nyamnyam-nextjs:153
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "600Mi"
+            requests:
+              cpu: "200m"
+              memory: "300Mi"
+      imagePullSecrets:
+        - name: nyamnyam-regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nyamnyam-nextjs
+  namespace: nyamnyam
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app: nyamnyam-nextjs
