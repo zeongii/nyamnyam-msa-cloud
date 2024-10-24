@@ -121,35 +121,24 @@ pipeline {
         }
 
         stage('Create ConfigMap') {
-            steps {
-                script {
-                    def configMaps = [
-                        ['name': 'config-server', 'path': 'nyamnyam.kr/server/config-server/src/main/resources/application.yaml'],
-                        ['name': 'eureka-server', 'path': 'nyamnyam.kr/server/eureka-server/src/main/resources/application.yaml'],
-                        ['name': 'gateway-server', 'path': 'nyamnyam.kr/server/gateway-server/src/main/resources/application.yaml'],
-                        ['name': 'admin-service', 'path': 'nyamnyam.kr/service/admin-service/src/main/resources/application.yaml'],
-                        ['name': 'chat-service', 'path': 'nyamnyam.kr/service/chat-service/src/main/resources/application.yaml'],
-                        ['name': 'post-service', 'path': 'nyamnyam.kr/service/post-service/src/main/resources/application.yaml'],
-                        ['name': 'restaurant-service', 'path': 'nyamnyam.kr/service/restaurant-service/src/main/resources/application.yaml'],
-                        ['name': 'user-service', 'path': 'nyamnyam.kr/service/user-service/src/main/resources/application.yaml']
-                    ]
-
-                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                        configMaps.each { configMap ->
-                            def exists = sh(script: "kubectl get configmap ${configMap.name} -n nyamnyam --ignore-not-found", returnStatus: true) == 0
-
-                            if (!exists) {
-                                sh """
-                                kubectl create configmap ${configMap.name} --from-file=${configMap.path} -n nyamnyam
-                                """
-                            } else {
-                                echo "ConfigMap ${configMap.name} already exists, skipping creation."
+                    steps {
+                        script {
+                            withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                                sh '''
+                                kubectl create configmap config-server --from-file=nyamnyam.kr/server/config-server/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap eureka-server --from-file=nyamnyam.kr/server/eureka-server/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap gateway-server --from-file=nyamnyam.kr/server/gateway-server/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap admin-service --from-file=nyamnyam.kr/service/admin-service/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap chat-service --from-file=nyamnyam.kr/service/chat-service/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap post-service --from-file=nyamnyam.kr/service/post-service/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap restaurant-service --from-file=nyamnyam.kr/service/restaurant-service/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap user-service --from-file=nyamnyam.kr/service/user-service/src/main/resources/application.yaml -n nyamnyam --dry-run=client -o yaml | kubectl apply -f -
+                                '''
                             }
                         }
                     }
-                }
-            }
         }
+
 
 
 
