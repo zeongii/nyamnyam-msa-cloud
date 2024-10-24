@@ -121,18 +121,25 @@ pipeline {
         }
 
         stage('Deploy to k8s') {
-                    steps {
-                        script {
-                            withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                                // 환경 변수로 API Key와 Secret Key 설정 후 ncp-iam-authenticator에 전달
-                                sh '''
-                                export NCP_ACCESS_KEY=$NCP_API_KEY
-                                export NCP_SECRET_KEY=$NCP_SECRET_KEY
-                                kubectl apply -f deploy/web/nyamnyam-web.yaml --kubeconfig=$KUBECONFIG
-                                '''
+                            steps {
+                                script {
+                                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                                        // 환경 변수로 API Key와 Secret Key 설정 후 ncp-iam-authenticator에 전달
+                                        sh '''
+                                        export NCP_ACCESS_KEY=$NCP_API_KEY
+                                        export NCP_SECRET_KEY=$NCP_SECRET_KEY
+                                        kubectl apply -f deploy/was/config-server/config-server.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f deploy/was/eureka-server/eureka-server.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f deploy/was/gateway-server/gateway-server.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f deploy/was/admin-service/admin-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f deploy/was/chat-service/chat-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f deploy/was/post-service/post-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f deploy/was/restaurant-service/restaurant-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f deploy/was/user-service/user-service.yaml --kubeconfig=$KUBECONFIG
+                                        '''
+                                    }
+                                }
                             }
-                        }
-                    }
         }
     }
 }
