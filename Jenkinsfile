@@ -128,14 +128,14 @@ pipeline {
                                         sh '''
                                         export NCP_ACCESS_KEY=$NCP_API_KEY
                                         export NCP_SECRET_KEY=$NCP_SECRET_KEY
-                                        kubectl apply -f deploy/was/config-server/config-server.yaml --kubeconfig=$KUBECONFIG
-                                        kubectl apply -f deploy/was/eureka-server/eureka-server.yaml --kubeconfig=$KUBECONFIG
-                                        kubectl apply -f deploy/was/gateway-server/gateway-server.yaml --kubeconfig=$KUBECONFIG
-                                        kubectl apply -f deploy/was/admin-service/admin-service.yaml --kubeconfig=$KUBECONFIG
-                                        kubectl apply -f deploy/was/chat-service/chat-service.yaml --kubeconfig=$KUBECONFIG
-                                        kubectl apply -f deploy/was/post-service/post-service.yaml --kubeconfig=$KUBECONFIG
-                                        kubectl apply -f deploy/was/restaurant-service/restaurant-service.yaml --kubeconfig=$KUBECONFIG
-                                        kubectl apply -f deploy/was/user-service/user-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/config-server/config-server.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/eureka-server/eureka-server.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/gateway-server/gateway-server.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/admin-service/admin-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/chat-service/chat-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/post-service/post-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/restaurant-service/restaurant-service.yaml --kubeconfig=$KUBECONFIG
+                                        kubectl apply -f nyamnyam.kr/deploy/was/user-service/user-service.yaml --kubeconfig=$KUBECONFIG
                                         '''
                                     }
                                 }
