@@ -23,11 +23,6 @@ public class AdminController {
     private final AdminService adminService;
     private final OpinionService opinionService;
 
-    @GetMapping("/reportAll")
-    public ResponseEntity<List<?>> reportAll() {
-        return ResponseEntity.ok(opinionService.findAll());
-    }
-
     @GetMapping("/countUserList")
     public ResponseEntity<List<?>> countUserList() {
         return ResponseEntity.ok(adminService.countUserList());
@@ -37,7 +32,6 @@ public class AdminController {
     public ResponseEntity<List<?>> countAreaList() {
         return ResponseEntity.ok(adminService.countAreaList());
     }
-
 
     @GetMapping("/countPostList")
     public ResponseEntity<List<?>> countPostList() {
