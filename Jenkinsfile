@@ -30,7 +30,7 @@ pipeline {
                         git branch: 'main', url: 'https://github.com/zeongii/nyamnyam-config-server.git', credentialsId: 'githubToken'
                     }
 
-                    dir ('nyamnyam.kr/server/config-server/src/main/resources/secret-server') {
+                    dir ('nyamnyam.kr/server/secret-server') {
                         git branch: 'main', url: 'https://github.com/zeongii/nyamnyam-secret-server.git', credentialsId: 'githubToken'
                     }
 
