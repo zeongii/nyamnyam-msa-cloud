@@ -5,9 +5,3 @@ spring:
     active: prod
   config:
     import: "optional:configserver:http://nyamnyam-config-server-7b53b-100121310-3bed78e90c73.kr.lb.naverncp.com:8888"
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://nyamnyam-eureka-server-f3a1e-100121310-3bed78e90c73.kr.lb.naverncp.com:8761/eureka/
