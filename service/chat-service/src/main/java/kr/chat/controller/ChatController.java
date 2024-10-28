@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/api/chats")
 public class ChatController {
 
@@ -44,7 +43,6 @@ public class ChatController {
     }
 
     //얘는 보낸 메세지를 바로 채널에다가  뿌려주는 친구
-    @CrossOrigin("*")
     @GetMapping(value = "/{chatRoomId}")
     public Flux<Chat> getMessageByChannel(@PathVariable String chatRoomId) {
 
@@ -76,23 +74,6 @@ public class ChatController {
     }
 
 
-    // 파일 업로드 엔드포인트
- /*   @PostMapping("/uploads")
-    public Mono<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
-        return chatService.uploadFile(file)
-                .map(url -> {
-                    Map<String, Object> resultMap = new HashMap<>();
-                    resultMap.put("file", true);
-                    resultMap.put("url", url);
-                    return resultMap;
-                })
-                .onErrorResume(e -> {
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("file", false);
-                    errorResponse.put("error", e.getMessage());
-                    return Mono.just(errorResponse);
-                });
-    }*/
 
 
 }
