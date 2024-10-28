@@ -141,6 +141,17 @@ public class AuthHandler {
         return Mono.empty();  // 요청을 처리하지 않고 빈 응답 반환
     }
 
+//    private Mono<Void> registerUserInUserServiceAsync(Map<String, Object> naverUserInfo) {
+//        return webClient.post()
+//                .uri("http://user-service/api/oauth/naver/signup")
+//                .bodyValue(naverUserInfo)
+//                .retrieve()
+//                .bodyToMono(Void.class)
+//                .onErrorResume(e -> {
+//                    System.err.println("Failed to register user: " + e.getMessage());
+//                    return Mono.empty();
+//                });
+//    }
 
     private Mono<String> issueJwtToken(Map<String, Object> naverUserInfo) {
         String userId = (String) naverUserInfo.get("id");
@@ -151,6 +162,23 @@ public class AuthHandler {
         // 실제 JWT 발급을 막고 '발급 예정'이라는 가짜 응답만 반환
         return Mono.just("JWT 발급 예정: " + userId);
     }
+
+
+//    private Mono<String> issueJwtToken(Map<String, Object> naverUserInfo) {
+//        String userId = (String) naverUserInfo.get("id");
+//
+//        String password = "NaverOAuthPassword";
+//
+//
+//        UserDetails userDetails = new UserDetailsImpl(
+//                userId,
+//                password,
+//                Collections.singletonList(new SimpleGrantedAuthority("USER"))
+//        );
+//
+//        return jwtTokenProvider.generateToken(userId, false);
+//    }
+
 
 
 

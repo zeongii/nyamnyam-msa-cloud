@@ -8,8 +8,6 @@ import kr.gateway.document.Token;
 import kr.gateway.repository.TokenRepository;
 import kr.gateway.repository.UserRepository;
 import lombok.Getter;
-import net.minidev.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +17,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 
-import javax.crypto.SecretKey;
+
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Collections;
@@ -29,7 +27,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
+    @Value("bywm4zC5-vR36j_mZPsd4jmNFUuny0XuYoln59AStsI=")
     private String secret;
 
     @Value("${jwt.expired.access}")
@@ -80,6 +78,9 @@ public class JwtTokenProvider {
         return Mono.just(token);
     }
 
+    public long accessTokenExpiration() {
+        return accessTokenExpiration;
+    }
 
     public Mono<String> refreshToken(String oldToken) {
 
