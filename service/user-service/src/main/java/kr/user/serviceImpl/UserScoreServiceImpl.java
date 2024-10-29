@@ -20,13 +20,13 @@ public class UserScoreServiceImpl implements UserScoreService {
     }
 
     @Override
-    public Flux<UserScore> findByScoreUserId(String scoreUserId) {
-        return userScoreRepository.findByScoreUserId(scoreUserId);
+    public Flux<UserScore> findByUserId(String userId) {
+        return userScoreRepository.findByUserId(userId);
     }
 
     @Override
     public Mono<Double> calculateUserAverageScore(String scoreUserId) {
-        return findByScoreUserId(scoreUserId)
+        return findByUserId(scoreUserId)
                 .map(UserScore::getScore)
                 .collectList()
                 .map(scores -> scores.stream()

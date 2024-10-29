@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/thumbnails")
+@RequestMapping("/thumbnails")
 public class UserThumbnailController {
 
     private final UserThumbnailService userThumbnailService;

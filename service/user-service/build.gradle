@@ -68,13 +68,13 @@ dependencies {
     // Selenium 의존성 추가
     implementation 'org.seleniumhq.selenium:selenium-java:4.14.0'
 
-    // AWS SDK S3
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.300'
-    implementation 'javax.xml.bind:jaxb-api:2.3.1'
-
     // JSON 파싱
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
+    //AWS SDK S3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.300'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'org.json:json:20211205'
 }
 
 tasks.named('test') {

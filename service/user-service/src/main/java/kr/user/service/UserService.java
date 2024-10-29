@@ -25,6 +25,6 @@ public interface UserService {
 
     Mono<User> save(User user, List<MultipartFile> thumbnails);
 
-
+    Mono<User> saveOAuthUser(String oauthId, String username, String nickname, String name, String ageRange, String tel, String gender, String profileImage);
 
 }

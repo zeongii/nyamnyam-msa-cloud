@@ -7,5 +7,5 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface UserScoreRepository extends ReactiveMongoRepository<UserScore, String> {
-    Flux<UserScore> findByScoreUserId(String scoreUserId);
+    Flux<UserScore> findByUserId(String scoreUserId);
 }

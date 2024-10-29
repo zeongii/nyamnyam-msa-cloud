@@ -6,6 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface UserScoreService {
     Mono<UserScore> save(UserScore userScore);
-    Flux<UserScore> findByScoreUserId(String scoreUserId);
+    Flux<UserScore> findByUserId(String userId);
     Mono<Double> calculateUserAverageScore(String scoreUserId);
 }

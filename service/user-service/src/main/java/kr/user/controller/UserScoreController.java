@@ -9,24 +9,28 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/score")
+@RequestMapping("/score")
 public class UserScoreController {
 
     private final UserScoreService userScoreService;
 
-    @PostMapping("/score")
-    public Mono<UserScore> score(@RequestBody UserScore userScore) {
+    @PostMapping("/scoreUp")
+    public Mono<UserScore> scoreUp(@RequestBody UserScore userScore) {
         return userScoreService.save(userScore);
     }
 
-    @GetMapping("/user/{scoreUserId}")
-    public Flux<UserScore> getUserScores(@PathVariable String scoreUserId) {
-        return userScoreService.findByScoreUserId(scoreUserId);
+    @PostMapping("/scoreDown")
+    public Mono<UserScore> scoreDown(@RequestBody UserScore userScore) {
+        return userScoreService.save(userScore);
     }
 
-    @GetMapping("/average/{scoreUserId}")
-    public Mono<Double> getUserAverageScore(@PathVariable String scoreUserId) {
-        return userScoreService.calculateUserAverageScore(scoreUserId);
+    @GetMapping("/user/{userId}")
+    public Flux<UserScore> getUserScores(@PathVariable String userId) {
+        return userScoreService.findByUserId(userId);
+    }
+
+    @GetMapping("/average/{userId}")
+    public Mono<Double> getUserAverageScore(@PathVariable String userId) {
+        return userScoreService.calculateUserAverageScore(userId);
     }
 }
-
