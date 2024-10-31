@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/score")
+@RequestMapping("/api/score")
 public class UserScoreController {
 
     private final UserScoreService userScoreService;
