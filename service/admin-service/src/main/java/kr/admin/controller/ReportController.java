@@ -11,8 +11,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin
 @RequestMapping("/api/report")
+@CrossOrigin(origins = "http://www.nyamnyam.kr")
 public class ReportController {
 
     private final ReportService reportService;
