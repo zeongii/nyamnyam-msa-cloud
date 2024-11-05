@@ -15,7 +15,13 @@ public class CorsConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
 
-        config.setAllowedOriginPatterns(Arrays.asList("https://www.nyamnyam.kr", "https://abc.nyamnyam.kr", "https://jiyeong.nyamnyam.kr"));
+        // 로컬 개발 환경과 다른 도메인 추가
+        config.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:3000",
+                "https://www.nyamnyam.kr",
+                "https://abc.nyamnyam.kr",
+                "https://jiyeong.nyamnyam.kr"
+        ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("*"));
