@@ -14,7 +14,6 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -37,7 +36,7 @@ public class WebSecurityConfig {
                 )
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 호출
                 .oauth2Login(oauth2Login -> oauth2Login
                         .clientRegistrationRepository(reactiveClientRegistrationRepository)
                         .authenticationSuccessHandler(serverAuthenticationSuccessHandler)
@@ -52,13 +51,18 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000, https://abc.nyamnyam.kr, https://jiyeong.nyamnyam.kr, https://www.nyamnyam.kr"));
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:3000",
+                "https://www.nyamnyam.kr",
+                "https://abc.nyamnyam.kr",
+                "https://jiyeong.nyamnyam.kr"
+        ));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+        corsConfiguration.setExposedHeaders(Arrays.asList("*"));
         corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -66,4 +70,3 @@ public class WebSecurityConfig {
         return source;
     }
 }
-
