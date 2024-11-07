@@ -66,7 +66,7 @@ public class WebSecurityConfig {
 
         ));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+        corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         corsConfiguration.setExposedHeaders(Arrays.asList("*"));
         corsConfiguration.setAllowCredentials(true);
 
