@@ -4,4 +4,5 @@ spring:
   profiles:
     active: prod
   config:
-    import: "optional:configserver:http://nyamnyam-config-server-0fcb3-100204825-630f1c851357.kr.lb.naverncp.com:8888/"
+    import: "optional:configserver:http://config-server:8888/"
+
