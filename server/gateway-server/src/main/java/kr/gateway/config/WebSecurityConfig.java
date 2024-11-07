@@ -55,14 +55,7 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:3000",
-                "https://www.nyamnyam.kr",
-                "https://nyamnyam.kr",
-                "https://abc.nyamnyam.kr",
-                "*.nyamnyam.kr",
-                "https://nyamnyam-vercel-front-78ywlgrc9-zeongiis-projects.vercel.app/",
-                "https://nyamnyam-vercel-front-git-main-zeongiis-projects.vercel.app/",
-                "https://nyamnyam-local-front.vercel.app"
+            "*"
 
         ));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
