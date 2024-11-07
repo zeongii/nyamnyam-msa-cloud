@@ -16,7 +16,7 @@ public class CorsConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
 
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000","*.nyamnyam.kr", "https://www.nyamnyam.kr", "https://abc.nyamnyam.kr"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000","*.nyamnyam.kr", "https://www.nyamnyam.kr", "https://abc.nyamnyam.kr"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("*"));
