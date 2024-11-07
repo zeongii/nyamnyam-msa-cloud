@@ -70,7 +70,7 @@ pipeline {
             steps {
                 script {
                     dir('nyamnyam.kr') {
-                        sh "cd server/config-server && docker build -t ${DOCKER_CREDENTIALS_ID}/nyamnyam-config-server:latest ."
+                        sh "cd server/config-server && docker build -t ${DOCKER_CREDENTIALS_ID}/nyamnyam-config-server:1.0 ."
                     }
 
                     dir('nyamnyam.kr') {
@@ -100,7 +100,7 @@ pipeline {
                     servicesList.each { service ->
                         def serviceName = service.split('/')[1] // 서비스 이름 추출
                         // 각 서비스의 Docker 이미지를 푸시
-                        sh "docker push ${DOCKER_CREDENTIALS_ID}/nyamnyam-${serviceName}:latest"
+                        sh "docker push ${DOCKER_CREDENTIALS_ID}/nyamnyam-${serviceName}:1.0"
                     }
                 }
             }
@@ -114,7 +114,7 @@ pipeline {
                     def servicesList = env.services.split(',')
                     servicesList.each { service ->
                         def serviceName = service.split('/')[1] // 서비스 이름 추출
-                        sh "docker rmi ${DOCKER_CREDENTIALS_ID}/nyamnyam-${serviceName}:latest" // Clean up the pushed image
+                        sh "docker rmi ${DOCKER_CREDENTIALS_ID}/nyamnyam-${serviceName}:1.0" // Clean up the pushed image
                     }
                 }
             }
