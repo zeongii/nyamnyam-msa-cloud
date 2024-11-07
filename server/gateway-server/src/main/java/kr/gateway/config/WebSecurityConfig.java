@@ -57,6 +57,7 @@ public class WebSecurityConfig {
         corsConfiguration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:3000",
                 "https://www.nyamnyam.kr",
+                "https://nyamnyam.kr",
                 "https://abc.nyamnyam.kr",
                 "*.nyamnyam.kr",
                 "https://nyamnyam-vercel-front-78ywlgrc9-zeongiis-projects.vercel.app/",

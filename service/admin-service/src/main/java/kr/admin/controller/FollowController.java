@@ -11,8 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/follow")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://www.nyamnyam.kr")
-
 public class FollowController {
 
     private final FollowService followService;

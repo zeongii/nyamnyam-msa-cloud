@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/api/tags")
 public class TagController {

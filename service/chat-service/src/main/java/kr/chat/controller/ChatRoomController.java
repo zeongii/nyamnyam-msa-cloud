@@ -12,7 +12,6 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin("*")
 @RequestMapping("/api/chatRoom")
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;

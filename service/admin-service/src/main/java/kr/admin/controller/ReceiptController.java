@@ -24,8 +24,6 @@ import java.util.stream.IntStream;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/receipt")
-@CrossOrigin(origins = "http://www.nyamnyam.kr")
-
 public class ReceiptController {
 
     private final NaverOcrApi naverOcrApi;

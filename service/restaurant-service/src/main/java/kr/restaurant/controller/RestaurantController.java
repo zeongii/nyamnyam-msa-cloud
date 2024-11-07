@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/restaurant")
-@CrossOrigin(origins = "http://www.nyamnyam.kr")
 public class RestaurantController {
 
     private final RestaurantService restaurantService;

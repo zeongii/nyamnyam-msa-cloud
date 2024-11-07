@@ -14,8 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://www.nyamnyam.kr")
-
 public class AdminController {
 
 
