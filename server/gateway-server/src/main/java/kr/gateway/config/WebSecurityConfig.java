@@ -27,19 +27,19 @@ public class WebSecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                        .pathMatchers("/auth/login").permitAll()
-                        .pathMatchers("/auth/oauth2/**").permitAll()
-                        .pathMatchers("/api/user/**").permitAll()
-                        .anyExchange().permitAll()
-                )
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 호출
                 .oauth2Login(oauth2Login -> oauth2Login
                         .clientRegistrationRepository(reactiveClientRegistrationRepository)
                         .authenticationSuccessHandler(serverAuthenticationSuccessHandler)
+                )
+                .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers(HttpMethod.OPTIONS).permitAll()
+                        .pathMatchers("/auth/login").permitAll()
+                        .pathMatchers("/auth/oauth2/**").permitAll()
+                        .pathMatchers("/api/user/**").permitAll()
+                        .anyExchange().permitAll()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((exchange, e) -> {
@@ -56,6 +56,8 @@ public class WebSecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:3000",
+                "https://www.nyamnyam.kr",
+                "https://abc.nyamnyam.kr",
                 "*.nyamnyam.kr",
                 "https://nyamnyam-vercel-front-78ywlgrc9-zeongiis-projects.vercel.app/",
                 "https://nyamnyam-vercel-front-git-main-zeongiis-projects.vercel.app/",
